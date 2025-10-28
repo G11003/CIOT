@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control Panel IoT</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <ul class="navbar-list">
+      <li class="navbar-item">
+        <a href="control.html" class="navbar-link is-active">Control</a>
+      </li>
+      <li class="navbar-item">
+        <a href="demos.html" class="navbar-link">DEMOS</a>
+      </li>
+      <li class="navbar-item">
+        <a href="monitor.html" class="navbar-link">Monitoreo</a>
+      </li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="control-panel-container">
+      
+      <div class="header">
+        <h1>Control Panel IoT</h1>
+        <p class="subtitle">Sistema de Control de Carrito</p>
+      </div>
+
+      <div class="controls-wrapper">
+        <div class="primary-movement-grid">
+          
+          <div style="grid-area: fwd;">
+            <button class="control-button color-cyan" data-command-id="1">
+              <div class="icon">↑</div>
+              <span class="label">Adelante</span>
+            </button>
+          </div>
+
+          <div style="grid-area: fwd-l;">
+            <button class="control-button color-magenta" data-command-id="5">
+              <div class="icon">↰</div>
+              <span class="label">Vuelta adelante izquierda</span>
+            </button>
+          </div>
+          <div style="grid-area: fwd-r;">
+            <button class="control-button color-magenta" data-command-id="4">
+              <div class="icon">↱</div>
+              <span class="label">Vuelta adelante derecha</span>
+            </button>
+          </div>
+
+          <div style="grid-area: stop;">
+            <button class="control-button color-red" data-command-id="3">
+              <div class="icon">■</div>
+              <span class="label">Detener</span>
+            </button>
+          </div>
+
+          <div style="grid-area: bwd-l;">
+            <button class="control-button color-purple" data-command-id="7">
+              <div class="icon">↲</div>
+              <span class="label">Vuelta atrás izquierda</span>
+            </button>
+          </div>
+          <div style="grid-area: bwd-r;">
+            <button class="control-button color-purple" data-command-id="6">
+              <div class="icon">↳</div>
+              <span class="label">Vuelta atrás derecha</span>
+            </button>
+          </div>
+
+          <div style="grid-area: bwd;">
+            <button class="control-button color-cyan" data-command-id="2">
+              <div class="icon">↓</div>
+              <span class="label">Atrás</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="rotation-controls">
+          <div class="rotation-grid">
+            <div class="rotation-column">
+              <button class="control-button color-green" data-command-id="9">
+                <div class="icon">↶</div>
+                <span class="label">Giro 90° izquierda</span>
+              </button>
+              <button class="control-button color-blue" data-command-id="11">
+                <div class="icon">⟲</div>
+                <span class="label">Giro 360° izquierda</span>
+              </button>
+            </div>
+             
+            <div class="rotation-column">
+              <button class="control-button color-green" data-command-id="8">
+                <div class="icon">↷</div>
+                <span class="label">Giro 90° derecha</span>
+              </button>
+              <button class="control-button color-blue" data-command-id="10">
+                <div class="icon">⟳</div>
+                <span class="label">Giro 360° derecha</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Sistema activo • Presiona cualquier botón para enviar comando</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="control.js"></script>
+</body>
+</html>

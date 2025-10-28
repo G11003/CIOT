@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitor IoT</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ======================== -->
+  <!-- NAVBAR SUPERIOR -->
+  <!-- ======================== -->
+  <nav class="navbar">
+    <ul class="navbar-list">
+      <li class="navbar-item">
+        <a href="control.html" class="navbar-link">Control</a>
+      </li>
+      <li class="navbar-item">
+        <a href="demos.html" class="navbar-link">Demos</a>
+      </li>
+      <li class="navbar-item">
+        <a href="monitor.html" class="navbar-link is-active">Monitoreo</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ======================== -->
+  <!-- PANEL PRINCIPAL -->
+  <!-- ======================== -->
+  <main class="monitor-dashboard-grid">
+
+    <!-- Fila 1 -->
+    <div class="monitor-status-box" id="box-last-move">
+      <h2>Último Movimiento</h2>
+      <p id="last-command-text" class="status-text-large">Esperando...</p>
+    </div>
+
+    <div class="monitor-status-box" id="box-last-obstacle">
+      <h2>Último Estatus Obstáculo</h2>
+      <p id="last-obstacle-text" class="status-text-large">Iniciando sensor...</p>
+    </div>
+
+    <!-- Fila 2 -->
+    <div class="monitor-log-box" id="box-moves-log">
+      <h2>Últimos 10 Movimientos</h2>
+      <ul id="moves-log-list" class="monitor-log-list">
+        <!-- Se llenará dinámicamente -->
+      </ul>
+    </div>
+
+    <div class="monitor-log-box" id="box-obstacles-log">
+      <h2>Últimos 10 Obstáculos</h2>
+      <ul id="obstacles-log-list" class="monitor-log-list">
+        <!-- Se llenará dinámicamente -->
+      </ul>
+    </div>
+
+    <div class="monitor-log-box" id="box-demos-log">
+      <h2>Últimas 20 Demos</h2>
+      <ul id="demos-log-list" class="monitor-log-list">
+        <!-- Se llenará dinámicamente -->
+      </ul>
+    </div>
+
+    <!-- Fila 3 -->
+    <div class="monitor-status-box" id="box-obstacle-mgmt">
+      <h2>Manejo de Obstáculo</h2>
+      <p id="obstacle-action-text" class="status-text-large">Esperando datos...</p>
+      <button id="execute-obstacle-action-btn" class="execute-action-btn" disabled>
+        Ejecutar Acción
+      </button>
+    </div>
+
+  </main>
+
+<script src="https://cdn.socket.io/4.6.0/socket.io.min.js" integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
+  <script src="monitor.js"></script>
+
+</body>
+</html>
+ 
