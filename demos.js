@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   // Constantes de API
-  const apiBaseUrl = 'http://54.161.121.152:5500'; // URL de tu API
+  const apiBaseUrl = 'https://54.161.121.152:5500'; // URL de tu API
   const dispositivoNombre = 'Robot Explorador v1';
 
 
