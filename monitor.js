@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { status_clave: 16, status_texto: "Evasión: Retroceso Corto y Giro Der" }
   ];
 
-  const apiBaseUrl = 'https://54.161.121.152:5500';
+  const apiBaseUrl = 'http://54.161.121.152:5500';
   const dispositivoNombre = 'Robot Explorador v1';
   const urlParams = `?dispositivo=${encodeURIComponent(dispositivoNombre)}`;
 

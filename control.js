@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // ===== INICIO DE LA MODIFICACIÓN =====
   // Pega esta línea aquí:
-  const apiBaseUrl = 'https://54.161.121.152:5500'; 
+  const apiBaseUrl = 'http://54.161.121.152:5500'; 
   // Definición de comandos
   const commands = [
     { status_clave: 1, status_texto: "Adelante" },
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // Llama al backend
-    fetch('https://54.161.121.152:5500/registrar-evento', {
+    fetch('http://54.161.121.152:5500/registrar-evento', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
