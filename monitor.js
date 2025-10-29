@@ -230,7 +230,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function loadInitialData() {
-    // ... (texto de "Cargando...")
     refreshUltimoEstatus();
     refreshMovimientosLog();
     refreshObstaculosLog();
