@@ -1,5 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   
+  // ===== INICIO DE LA MODIFICACIÓN =====
+  // Pega esta línea aquí:
+  const apiBaseUrl = 'http://54.161.121.152:5500'; 
   // Definición de comandos
   const commands = [
     { status_clave: 1, status_texto: "Adelante" },
