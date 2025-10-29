@@ -234,8 +234,7 @@ Error
   }
 
   function loadInitialData() {
-    // ... (texto de "Cargando...")
-  Jala
+
     refreshUltimoEstatus();
     refreshMovimientosLog();
     refreshObstaculosLog();
