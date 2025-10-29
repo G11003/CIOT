@@ -242,7 +242,8 @@ def handle_disconnect():
 
 # --- Iniciar el Servidor ---
 if __name__ == '__main__':
-    print("Iniciando servidor Flask con SocketIO...")
-    print(f"Intentando conectar a DB host: {db_config.get('host')}") 
-    # ***** USAR socketio.run() EN LUGAR DE app.run() *****
-    socketio.run(app, debug=True, port=5000)
+    print("Iniciando servidor Flask con SocketIO en modo producción...")
+    print(f"Escuchando en http://0.0.0.0:5500")
+    # debug=False es vital para producción
+    # host='0.0.0.0' permite conexiones externas
+    socketio.run(app, debug=False, host='0.0.0.0', port=5500)
