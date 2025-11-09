@@ -438,7 +438,27 @@ document.addEventListener("DOMContentLoaded", () => {
           p_status_clave: move.status_clave,
           tipo_evento: 'Operacion' 
       };
-  
+  try {
+          const response = await fetch(`${apiBaseUrl}/registrar-evento`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(apiData),
+          });
+          
+          if (!response.ok) throw new Error('Respuesta de red no fue OK');
+          
+          const data = await response.json();
+          if(data.success) {
+              console.log(`Paso de demo [${commandString}] registrado en BD.`);
+          } else {
+              console.error("Error al registrar paso de demo en BD:", data.error);
+          }
+      } catch (error) {
+          console.error('Error de conexión al registrar paso de demo:', error);
+          // Opcional: detener la demo si un paso falla
+          // stopDemo(); 
+          // return;
+      }
       fetch(`${apiBaseUrl}/registrar-evento`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
