@@ -245,10 +245,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Elimina la demo seleccionada (Local y debería llamar a API)
-   * TODO: Implementar endpoint /demos/eliminar en el backend y llamarlo aquí.
-   */
-  /**
    * Elimina la demo seleccionada llamando a la API y luego actualiza localmente.
    */
   async function deleteSelectedDemo() {
@@ -259,12 +255,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // (Opcional: Confirmación visual, aunque no usamos alert/confirm)
-      // const demoNameToDelete = savedDemos.find(d => d.id_secuencia == selectedId)?.name || `ID ${selectedId}`;
-      // if (!confirm(`¿Estás seguro de eliminar la demo "${demoNameToDelete}"?`)) {
-      //     return;
-      // }
-
       console.log(`Intentando eliminar demo con ID: ${selectedId}`);
 
       try {
@@ -274,7 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
           });
           const result = await response.json(); // Espera algo como [{"filas_eliminadas": 1}]
 
-          // Verifica si la API reportó éxito (asumiendo que devuelve filas_eliminadas > 0)
+          // Verifica si la API reportó éxito
           if (response.ok && result && result.length > 0 && result[0].filas_eliminadas > 0) {
               console.log(`Demo con ID ${selectedId} eliminada exitosamente de la BD.`);
               
@@ -303,7 +293,6 @@ document.addEventListener("DOMContentLoaded", () => {
    * Actualiza la UI de los botones de control de la demo
    */
   function setDemoUI(state) {
-    // ... (sin cambios) ...
       if (state === 'stopped') {
         demoSelectElement.style.display = 'block';
         runDemoButton.style.display = 'block';
@@ -398,8 +387,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // ===================================================================
+  // ===== INICIO DE LA FUNCIÓN MODIFICADA (SINCRONIZADA) =====
+  // ===================================================================
+
   /**
    * Ejecuta un solo paso de la demo y actualiza localStorage
+   * (MODIFICADO Y REORDENADO PARA SINCRONIZACIÓN)
    */
   async function runDemoStep() {
     if (demoRunState !== 'running' || !currentRunningDemo) return;
@@ -410,89 +404,81 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Obtiene el movimiento actual { status_clave, status_texto }
+    // Obtiene el movimiento actual
     const move = currentRunningDemo.moves[currentDemoIndex]; 
     const commandString = `${move.status_texto} (${move.status_clave})`;
 
-    // Simula el clic visual y actualiza localStorage para el monitor
+    // ==========================================================
+    // ===== INICIO DE LA REESTRUCTURACIÓN (FIX SINCRONIZACIÓN) =====
+    // ==========================================================
+
+    // --- PASO 1: PREPARAR Y ENVIAR EL COMANDO (Y ESPERAR) ---
+    const apiData = {
+        p_nombre_dispositivo: dispositivoNombre,
+        p_status_clave: move.status_clave,
+        tipo_evento: 'Operacion'
+    };
+
+    try {
+        const response = await fetch(`${apiBaseUrl}/registrar-evento`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(apiData),
+        });
+        
+        if (!response.ok) throw new Error('Respuesta de red no fue OK');
+        
+        const data = await response.json();
+        if(data.success) {
+            console.log(`Paso de demo [${commandString}] registrado en BD.`);
+        } else {
+            console.error("Error al registrar paso de demo en BD:", data.error);
+        }
+    } catch (error) {
+        console.error('Error de conexión al registrar paso de demo:', error);
+        // Opcional: detener la demo si un paso falla
+        // stopDemo(); 
+        // return;
+    }
+
+    // --- PASO 2: EL SERVIDOR YA CONFIRMÓ. AHORA, MOSTRAR LA ANIMACIÓN Y ACTUALIZAR UI ---
+    // (Ahora esto está sincronizado con el servidor)
     const button = document.querySelector(`.demo-controls-container .control-button[data-command-id="${move.status_clave}"]`);
     if (button) {
       button.classList.add('is-active');
-      localStorage.setItem('lastCommand', commandString); // Actualiza último comando
+      localStorage.setItem('lastCommand', commandString);
       
-      // Actualiza el log de movimientos en localStorage
       const log = JSON.parse(localStorage.getItem('lastMovementsLog') || '[]');
-      log.push(commandString); 
+      log.push(commandString);
       if (log.length > 10) log.shift();
       localStorage.setItem('lastMovementsLog', JSON.stringify(log));
-      // Dispara evento para monitor.js en la misma pestaña (si aplica)
+
+      // Dispara evento para monitor.js (AHORA ESTÁ SINCRONIZADO)
       window.dispatchEvent(new StorageEvent('storage', { key: 'lastMovementsLog', newValue: JSON.stringify(log) }));
-
       
-      // ==========================================================
-      // ===== INICIO DE LA MODIFICACIÓN (FIX PROBLEMA 2) =====
-      // ==========================================================
-      // AÑADIR ESTA LLAMADA A LA API PARA REGISTRAR EL MOVIMIENTO
-      const apiData = {
-          p_nombre_dispositivo: dispositivoNombre,
-          p_status_clave: move.status_clave,
-          tipo_evento: 'Operacion' 
-      };
-  try {
-          const response = await fetch(`${apiBaseUrl}/registrar-evento`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(apiData),
-          });
-          
-          if (!response.ok) throw new Error('Respuesta de red no fue OK');
-          
-          const data = await response.json();
-          if(data.success) {
-              console.log(`Paso de demo [${commandString}] registrado en BD.`);
-          } else {
-              console.error("Error al registrar paso de demo en BD:", data.error);
-          }
-      } catch (error) {
-          console.error('Error de conexión al registrar paso de demo:', error);
-          // Opcional: detener la demo si un paso falla
-          // stopDemo(); 
-          // return;
-      }
-      fetch(`${apiBaseUrl}/registrar-evento`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(apiData),
-      })
-      .then(response => response.json())
-      .then(data => {
-          if(data.success) {
-              console.log(`Paso de demo [${commandString}] registrado en BD.`);
-          } else {
-              console.error("Error al registrar paso de demo en BD:", data.error);
-          }
-      })
-      .catch(error => {
-          console.error('Error de conexión al registrar paso de demo:', error);
-      });
-      // ==========================================================
-      // ===== FIN DE LA MODIFICACIÓN =====
-      // ==========================================================
-
-
+      // --- PASO 3: ELIMINAMOS EL BLOQUE DUPLICADO (YA NO ESTÁ) ---
+      
+      // --- PASO 4: ESPERAR A QUE LA ANIMACIÓN TERMINE ---
       await sleep(300); // Duración animación
       button.classList.remove('is-active');
     }
     
+    // --- PASO 5: ESPERAR A QUE EL MOVIMIENTO FÍSICO TERMINE ---
+    // (Ajusta este valor si 2.5s es mucho o poco)
     await sleep(2500); // Pausa entre movimientos
 
     currentDemoIndex++; // Avanza al siguiente paso
 
-    // Llama al siguiente paso (si no se ha pausado/detenido mientras dormía)
+    // Llama al siguiente paso
     if (demoRunState === 'running') {
         runDemoStep(); 
     }
   }
+  
+  // ===================================================================
+  // ===== FIN DE LA FUNCIÓN MODIFICADA =====
+  // ===================================================================
+
 
   /**
    * Se llama cuando la demo se completa con éxito (actualiza la API)
