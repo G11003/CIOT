@@ -47,11 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const resumeDemoButton = document.getElementById("resume-demo-button");
   const stopDemoButton = document.getElementById("stop-demo-button");
 
-  // ==========================================================
-  // ===== ¡NUEVO! Objeto para el comando "Detener" =====
-  // ==========================================================
   const stopCommand = commands.find(c => c.status_clave === 3);
-  // ==========================================================
 
 
   // --- Función de Utilidad ---
@@ -388,11 +384,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===================================================================
-  // ===== INICIO DE LA FUNCIÓN MODIFICADA (LÓGICA DE DETENER) =====
+  // ===== INICIO DE LA FUNCIÓN MODIFICADA (LÓGICA DE CHECKPOINTS) =====
   // ===================================================================
 
   /**
    * (Función auxiliar) Envía un comando a la API y espera la confirmación.
+   * (Esta función no tiene cambios)
    */
   async function sendDemoCommandToApi(command) {
     const apiData = {
@@ -418,15 +415,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } catch (error) {
       console.error('Error de conexión al registrar paso de demo:', error);
-      // Opcional: detener la demo si un paso falla
-      // stopDemo(); 
     }
   }
 
   /**
    * Ejecuta un solo paso de la demo, espera un tiempo, y LUEGO LO DETIENE.
+   * (MODIFICADO con checkpoints para arreglar el bug de 'stacking')
    */
   async function runDemoStep() {
+    // Checkpoint 0: Salir si no estamos en 'running'
     if (demoRunState !== 'running' || !currentRunningDemo) return;
 
     // Verifica si la demo terminó
@@ -441,6 +438,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- PASO 1: ENVIAR EL MOVIMIENTO (Ej: "Adelante") ---
     await sendDemoCommandToApi(move);
+    // Checkpoint 1: Salir si se pausó durante el envío
+    if (demoRunState !== 'running') return;
 
     // --- PASO 2: MOSTRAR ANIMACIÓN DEL MOVIMIENTO ---
     const button = document.querySelector(`.demo-controls-container .control-button[data-command-id="${move.status_clave}"]`);
@@ -457,30 +456,37 @@ document.addEventListener("DOMContentLoaded", () => {
       
       // Esperar a que la animación termine
       await sleep(300);
+      // Checkpoint 2: Salir si se pausó durante la animación
+      if (demoRunState !== 'running') return;
       button.classList.remove('is-active');
     }
     
     // --- PASO 3: ESPERAR DURACIÓN DEL MOVIMIENTO (Tiempo Límite) ---
-    // (Ajusta este valor. 2000ms = 2 segundos)
-    const duracionMovimiento = 2000;
+    const duracionMovimiento = 2000; // 2 segundos
     await sleep(duracionMovimiento);
+    // Checkpoint 3: Salir si se pausó durante el movimiento
+    if (demoRunState !== 'running') return;
 
     // --- PASO 4: ENVIAR "DETENER" (A MENOS QUE EL MOVIMIENTO YA FUERA "DETENER") ---
     if (move.status_clave !== 3) { // 3 es la clave de "Detener"
       await sendDemoCommandToApi(stopCommand);
+      // Checkpoint 4: Salir si se pausó durante el envío de "Detener"
+      if (demoRunState !== 'running') return;
 
-      // (Opcional: mostrar animación de "Detener")
       const stopButton = document.querySelector(`.demo-controls-container .control-button[data-command-id="3"]`);
       if (stopButton) {
         stopButton.classList.add('is-active');
         localStorage.setItem('lastCommand', "Detener (Demo)"); // Actualiza monitor
         await sleep(100);
+        // No necesitamos un checkpoint aquí, es la última acción del bloque
         stopButton.classList.remove('is-active');
       }
     }
 
     // --- PASO 5: PAUSA CORTA ENTRE MOVIMIENTOS ---
     await sleep(500); // 0.5s de pausa antes del siguiente comando
+    // Checkpoint 5: Salir si se pausó durante la pausa final
+    if (demoRunState !== 'running') return;
 
     // --- PASO 6: IR AL SIGUIENTE PASO ---
     currentDemoIndex++; 
@@ -496,13 +502,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Se llama cuando la demo se completa con éxito (actualiza la API)
-   * (MODIFICADO para enviar un "Detener" final)
+   * (Esta función no tiene cambios)
    */
   async function finishDemo() {
     console.log("Demo finalizada. Enviando comando 'Detener' final.");
 
-    // --- ¡NUEVO PASO CRÍTICO! ---
-    // Asegurarse de que el robot se detenga al final.
     await sendDemoCommandToApi(stopCommand);
     
     localStorage.setItem('lastCommand', 'Demo finalizada.');
@@ -532,7 +536,10 @@ document.addEventListener("DOMContentLoaded", () => {
   async function pauseDemo() {
     if (demoRunState !== 'running' || !currentExecutionId) return;
     
-    demoRunState = 'paused';
+    // ¡ESTO ES LO IMPORTANTE!
+    // Al cambiar el estado, los 'checkpoints' en runDemoStep
+    // se activarán y la función dejará de ejecutarse.
+    demoRunState = 'paused'; 
     localStorage.setItem('lastCommand', 'Demo pausada.');
     console.log("Demo pausada en el paso:", currentDemoIndex);
     
@@ -555,23 +562,26 @@ document.addEventListener("DOMContentLoaded", () => {
     await updateDemoStatusInApi('Iniciada', currentDemoIndex);
     
     setDemoUI('running');
-    runDemoStep();
+    runDemoStep(); // ¡Esto inicia UN solo loop nuevo!
   }
 
   /**
    * Finaliza (detiene) la demo actual (actualiza la API)
-   * (MODIFICADO para enviar "Detener" al cancelar)
+   * (Esta función no tiene cambios)
    */
   async function stopDemo() {
     if (demoRunState === 'stopped' || !currentExecutionId) return;
     
     const wasPaused = demoRunState === 'paused';
-    demoRunState = 'stopped'; // Esto detendrá el bucle de runDemoStep
+    
+    // ¡ESTO ES LO IMPORTANTE!
+    // Al cambiar el estado, los 'checkpoints' en runDemoStep
+    // se activarán y la función dejará de ejecutarse.
+    demoRunState = 'stopped'; 
+    
     localStorage.setItem('lastCommand', 'Demo detenida.');
     console.log("Demo detenida por el usuario en el paso:", currentDemoIndex);
 
-    // --- ¡NUEVO PASO CRÍTICO! ---
-    // Asegurarse de que el robot se detenga si se cancela.
     await sendDemoCommandToApi(stopCommand);
 
     await updateDemoStatusInApi('Cancelada', currentDemoIndex); 
