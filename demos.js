@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
     { status_clave: 9, status_texto: "Giro 90° izquierda" },
     { status_clave: 10, status_texto: "Giro 360° derecha" },
     { status_clave: 11, status_texto: "Giro 360° izquierda" },
+    // Nuevos comandos de modo
+    { status_clave: 100, status_texto: "SET_EVASION_MANUAL" },
+    { status_clave: 101, status_texto: "SET_EVASION_AUTO" },
   ];
 
   // Constantes de API
@@ -41,8 +44,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const pauseDemoButton = document.getElementById("pause-demo-button");
   const resumeDemoButton = document.getElementById("resume-demo-button");
   const stopDemoButton = document.getElementById("stop-demo-button");
+  
+  // --- NUEVA Referencia (Checkbox) ---
+  const autoEvasionToggle = document.getElementById("auto-evasion-toggle");
 
-  // Objeto para el comando "Detener"
   const stopCommand = commands.find(c => c.status_clave === 3);
 
 
@@ -53,6 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Carga demos DESDE LA API y las pone en el <select>.
+   * (Esta función no tiene cambios)
    */
   async function loadSavedDemos() {
     try {
@@ -109,6 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   /**
    * Función auxiliar para poblar el <select> (usada en el fallback)
+   * (Esta función no tiene cambios)
    */
    function populateDemoSelectWithOptions() {
         demoSelectElement.innerHTML = ''; 
@@ -140,6 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Renderiza la lista de movimientos en el <ul>
+   * (Esta función no tiene cambios)
    */
   function renderMovesList() {
     movesListElement.innerHTML = '';
@@ -173,6 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Añade un movimiento a la lista de la demo actual
+   * (Esta función no tiene cambios)
    */
   function addMoveToDemo(command) {
     if (demoRunState !== 'stopped') return; 
@@ -182,6 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Elimina un movimiento de la lista por su índice
+   * (Esta función no tiene cambios)
    */
   function deleteMove(index) {
     currentDemoMoves.splice(index, 1);
@@ -190,6 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Guarda la demo actual llamando a la API y obtiene el ID.
+   * (Esta función no tiene cambios)
    */
   async function saveDemo() {
     const demoName = demoNameInput.value.trim();
@@ -234,6 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Elimina la demo seleccionada llamando a la API y luego actualiza localmente.
+   * (Esta función no tiene cambios)
    */
   async function deleteSelectedDemo() {
       const selectedId = demoSelectElement.value;
@@ -276,12 +288,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Actualiza la UI de los botones de control de la demo
+   * (Esta función no tiene cambios)
    */
   function setDemoUI(state) {
       if (state === 'stopped') {
         demoSelectElement.style.display = 'block';
         runDemoButton.style.display = 'block';
         deleteDemoButton.style.display = 'block';
+        autoEvasionToggle.disabled = false; // <-- Habilitar checkbox
         inProgressControls.style.display = 'none';
 
         runDemoButton.disabled = false;
@@ -292,6 +306,7 @@ document.addEventListener("DOMContentLoaded", () => {
         demoSelectElement.style.display = 'none';
         runDemoButton.style.display = 'none';
         deleteDemoButton.style.display = 'none';
+        autoEvasionToggle.disabled = true; // <-- Deshabilitar checkbox
         inProgressControls.style.display = 'grid'; 
 
         pauseDemoButton.style.display = 'block';
@@ -312,6 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Inicia la ejecución de la demo llamando a la API con el ID correcto.
+   * (MODIFICADO para enviar el modo de evasión)
    */
   async function runDemo() {
     if (demoRunState !== 'stopped') return;
@@ -336,6 +352,17 @@ document.addEventListener("DOMContentLoaded", () => {
      }
 
     console.log(`Iniciando demo: "${currentRunningDemo.name}" (ID: ${selectedSequenceId})`);
+
+    // ==========================================================
+    // ===== ¡NUEVO! ENVIAR MODO DE EVASIÓN ANTES DE INICIAR =====
+    // ==========================================================
+    const isAutoEvasion = autoEvasionToggle.checked;
+    const evasionCommand = isAutoEvasion ? 
+        commands.find(c => c.status_clave === 101) : // SET_EVASION_AUTO
+        commands.find(c => c.status_clave === 100); // SET_EVASION_MANUAL
+    
+    await sendDemoCommandToApi(evasionCommand);
+    // ==========================================================
     
     const apiData = {
       p_id_secuencia: selectedSequenceId, 
