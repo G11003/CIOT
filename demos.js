@@ -47,9 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const resumeDemoButton = document.getElementById("resume-demo-button");
   const stopDemoButton = document.getElementById("stop-demo-button");
 
-  const stopCommand = commands.find(c => c.status_clave === 3);
-
-
   // --- Función de Utilidad ---
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -57,25 +54,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Carga demos DESDE LA API y las pone en el <select>.
-   * (Esta función no tiene cambios)
+   * También intenta cargar los detalles (moves) desde localStorage como caché.
    */
   async function loadSavedDemos() {
     try {
+        // 1. Obtener la lista básica de demos (ID y Nombre) desde la API
         const response = await fetch(`${apiBaseUrl}/demos/listar`);
         const demosFromApi = await response.json();
+
+        // 2. Obtener el caché de demos completo (con moves) desde localStorage
         const demosFromStorage = JSON.parse(localStorage.getItem('iotDemos') || '[]');
 
+        // 3. Combinar datos: Usar la lista de la API como base y añadir 'moves' desde el caché
         savedDemos = demosFromApi.map(apiDemo => {
             const storedDemo = demosFromStorage.find(d => d.id_secuencia == apiDemo.id_secuencia);
             return { 
                 id_secuencia: apiDemo.id_secuencia, 
                 name: apiDemo.nombre_secuencia,
-                moves: storedDemo ? storedDemo.moves : []
+                moves: storedDemo ? storedDemo.moves : [] // Añadir moves si existen en caché
             };
         }); 
         
+        // (Opcional) Actualizar localStorage con la lista combinada (sincronizada con la API)
         localStorage.setItem('iotDemos', JSON.stringify(savedDemos)); 
 
+        // --- Lógica para poblar el <select> (sin cambios visuales) ---
         demoSelectElement.innerHTML = ''; 
         if (savedDemos.length === 0) {
           const option = document.createElement('option');
@@ -92,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           savedDemos.forEach((demo) => { 
             const option = document.createElement('option');
-            option.value = demo.id_secuencia;
+            option.value = demo.id_secuencia; // Usar el ID real
             option.textContent = demo.name;
             demoSelectElement.appendChild(option);
           });
@@ -100,10 +103,12 @@ document.addEventListener("DOMContentLoaded", () => {
           runDemoButton.disabled = false; runDemoButton.classList.remove('disabled');
           deleteDemoButton.disabled = false; deleteDemoButton.classList.remove('disabled'); 
         }
+
     } catch (error) {
         console.error("Error al cargar demos desde la API:", error);
+        // Fallback: Intentar cargar directamente desde localStorage si la API falla
         savedDemos = JSON.parse(localStorage.getItem('iotDemos') || '[]');
-        populateDemoSelectWithOptions();
+        populateDemoSelectWithOptions(); // Llama a una función auxiliar para poblar el select
         if(savedDemos.length === 0){
              demoSelectElement.innerHTML = '<option value="-1">Error al cargar demos</option>';
              runDemoButton.disabled = true; runDemoButton.classList.add('disabled');
@@ -114,7 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
   /**
    * Función auxiliar para poblar el <select> (usada en el fallback)
-   * (Esta función no tiene cambios)
    */
    function populateDemoSelectWithOptions() {
         demoSelectElement.innerHTML = ''; 
@@ -131,9 +135,9 @@ document.addEventListener("DOMContentLoaded", () => {
           defaultOption.textContent = "Selecciona una demo...";
           demoSelectElement.appendChild(defaultOption);
 
-          savedDemos.forEach((demo, index) => {
+          savedDemos.forEach((demo, index) => { // Usar índice si no hay id_secuencia
             const option = document.createElement('option');
-            option.value = demo.id_secuencia || index;
+            option.value = demo.id_secuencia || index; // Prioriza ID, usa índice como fallback
             option.textContent = demo.name;
             demoSelectElement.appendChild(option);
           });
@@ -146,7 +150,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Renderiza la lista de movimientos en el <ul>
-   * (Esta función no tiene cambios)
    */
   function renderMovesList() {
     movesListElement.innerHTML = '';
@@ -180,7 +183,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Añade un movimiento a la lista de la demo actual
-   * (Esta función no tiene cambios)
    */
   function addMoveToDemo(command) {
     if (demoRunState !== 'stopped') return; 
@@ -190,7 +192,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Elimina un movimiento de la lista por su índice
-   * (Esta función no tiene cambios)
    */
   function deleteMove(index) {
     currentDemoMoves.splice(index, 1);
@@ -199,7 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Guarda la demo actual llamando a la API y obtiene el ID.
-   * (Esta función no tiene cambios)
    */
   async function saveDemo() {
     const demoName = demoNameInput.value.trim();
@@ -222,18 +222,20 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result.success && result.id_secuencia) {
         console.log(`¡Demo "${demoName}" guardada en BD con ID: ${result.id_secuencia}!`);
         
+        // Actualiza cache local con el nuevo ID y los moves completos
         const newDemoData = { 
             id_secuencia: result.id_secuencia, 
             name: demoName, 
-            moves: [...currentDemoMoves]
+            moves: [...currentDemoMoves] // Guarda los objetos de movimiento completos
         };
         savedDemos.push(newDemoData); 
-        localStorage.setItem('iotDemos', JSON.stringify(savedDemos));
+        localStorage.setItem('iotDemos', JSON.stringify(savedDemos)); // Actualiza caché persistente
         
+        // Limpia UI y recarga <select>
         currentDemoMoves = [];
         demoNameInput.value = '';
         renderMovesList();
-        loadSavedDemos();
+        loadSavedDemos(); // Recarga para que el nuevo ID esté en la opción
       } else {
         console.error("Error al guardar demo en BD:", result.error || "No se devolvió ID.");
       }
@@ -243,33 +245,45 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
+   * Elimina la demo seleccionada (Local y debería llamar a API)
+   * TODO: Implementar endpoint /demos/eliminar en el backend y llamarlo aquí.
+   */
+  /**
    * Elimina la demo seleccionada llamando a la API y luego actualiza localmente.
-   * (Esta función no tiene cambios)
    */
   async function deleteSelectedDemo() {
-      const selectedId = demoSelectElement.value;
+      const selectedId = demoSelectElement.value; // ID de la secuencia
       
       if (selectedId === "-1") {
         console.warn("Por favor, selecciona una demo para eliminar.");
         return;
       }
 
+      // (Opcional: Confirmación visual, aunque no usamos alert/confirm)
+      // const demoNameToDelete = savedDemos.find(d => d.id_secuencia == selectedId)?.name || `ID ${selectedId}`;
+      // if (!confirm(`¿Estás seguro de eliminar la demo "${demoNameToDelete}"?`)) {
+      //     return;
+      // }
+
       console.log(`Intentando eliminar demo con ID: ${selectedId}`);
 
       try {
+          // --- LLAMADA A LA API PARA BORRAR EN BD ---
           const response = await fetch(`${apiBaseUrl}/demos/eliminar/${selectedId}`, { 
               method: 'DELETE' 
           });
-          const result = await response.json();
+          const result = await response.json(); // Espera algo como [{"filas_eliminadas": 1}]
 
+          // Verifica si la API reportó éxito (asumiendo que devuelve filas_eliminadas > 0)
           if (response.ok && result && result.length > 0 && result[0].filas_eliminadas > 0) {
               console.log(`Demo con ID ${selectedId} eliminada exitosamente de la BD.`);
               
+              // --- ACTUALIZACIÓN LOCAL (SOLO DESPUÉS DE ÉXITO EN API) ---
               const realIndex = savedDemos.findIndex(demo => demo.id_secuencia == selectedId);
               if (realIndex > -1) {
-                  savedDemos.splice(realIndex, 1);
-                  localStorage.setItem('iotDemos', JSON.stringify(savedDemos));
-                  loadSavedDemos();
+                  savedDemos.splice(realIndex, 1); // Elimina del caché local
+                  localStorage.setItem('iotDemos', JSON.stringify(savedDemos)); // Actualiza localStorage
+                  loadSavedDemos(); // Recarga el <select> desde el caché actualizado
                   console.log("Actualización local completada.");
               }
           } else {
@@ -287,9 +301,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Actualiza la UI de los botones de control de la demo
-   * (Esta función no tiene cambios)
    */
   function setDemoUI(state) {
+    // ... (sin cambios) ...
       if (state === 'stopped') {
         demoSelectElement.style.display = 'block';
         runDemoButton.style.display = 'block';
@@ -324,7 +338,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Inicia la ejecución de la demo llamando a la API con el ID correcto.
-   * (Esta función no tiene cambios)
    */
   async function runDemo() {
     if (demoRunState !== 'stopped') return;
@@ -335,6 +348,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     
+    // Encuentra la demo COMPLETA (con moves) en el cache local 'savedDemos'
     currentRunningDemo = savedDemos.find(demo => demo.id_secuencia == selectedSequenceId); 
     
     if (!currentRunningDemo) {
@@ -342,6 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Error: No se encontraron los detalles de la demo seleccionada. Intenta recargar la página.");
         return;
     }
+     // Asegúrate de que currentRunningDemo.moves exista y tenga contenido
      if (!currentRunningDemo.moves || currentRunningDemo.moves.length === 0) {
         console.error(`Error: La demo "${currentRunningDemo.name}" (ID: ${selectedSequenceId}) no tiene movimientos cargados.`);
         alert(`Error: No se pudieron cargar los pasos para la demo "${currentRunningDemo.name}". Revisa si se guardó correctamente.`);
@@ -374,56 +389,19 @@ document.addEventListener("DOMContentLoaded", () => {
           runDemoStep(); // Comienza la ejecución de pasos
         } else {
           console.error("Error al iniciar demo en BD:", result.error || "No se devolvió ID de ejecución.");
-          setDemoUI('stopped');
+          setDemoUI('stopped'); // Vuelve al estado inicial si falla
         }
     } catch (error) {
       console.error('Error de conexión al iniciar demo:', error);
       alert('Error de conexión al iniciar la demo. Revisa si el servidor backend está corriendo.');
-      setDemoUI('stopped');
-    }
-  }
-
-  // ===================================================================
-  // ===== INICIO DE LA FUNCIÓN MODIFICADA (LÓGICA DE CHECKPOINTS) =====
-  // ===================================================================
-
-  /**
-   * (Función auxiliar) Envía un comando a la API y espera la confirmación.
-   * (Esta función no tiene cambios)
-   */
-  async function sendDemoCommandToApi(command) {
-    const apiData = {
-      p_nombre_dispositivo: dispositivoNombre,
-      p_status_clave: command.status_clave,
-      tipo_evento: 'Operacion'
-    };
-
-    try {
-      const response = await fetch(`${apiBaseUrl}/registrar-evento`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(apiData),
-      });
-      
-      if (!response.ok) throw new Error('Respuesta de red no fue OK');
-      
-      const data = await response.json();
-      if(data.success) {
-          console.log(`Paso de demo [${command.status_texto}] registrado en BD.`);
-      } else {
-          console.error("Error al registrar paso de demo en BD:", data.error);
-      }
-    } catch (error) {
-      console.error('Error de conexión al registrar paso de demo:', error);
+      setDemoUI('stopped'); // Vuelve al estado inicial si falla la conexión
     }
   }
 
   /**
-   * Ejecuta un solo paso de la demo, espera un tiempo, y LUEGO LO DETIENE.
-   * (MODIFICADO con checkpoints para arreglar el bug de 'stacking')
+   * Ejecuta un solo paso de la demo y actualiza localStorage
    */
   async function runDemoStep() {
-    // Checkpoint 0: Salir si no estamos en 'running'
     if (demoRunState !== 'running' || !currentRunningDemo) return;
 
     // Verifica si la demo terminó
@@ -432,83 +410,75 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Obtiene el movimiento actual
+    // Obtiene el movimiento actual { status_clave, status_texto }
     const move = currentRunningDemo.moves[currentDemoIndex]; 
     const commandString = `${move.status_texto} (${move.status_clave})`;
 
-    // --- PASO 1: ENVIAR EL MOVIMIENTO (Ej: "Adelante") ---
-    await sendDemoCommandToApi(move);
-    // Checkpoint 1: Salir si se pausó durante el envío
-    if (demoRunState !== 'running') return;
-
-    // --- PASO 2: MOSTRAR ANIMACIÓN DEL MOVIMIENTO ---
+    // Simula el clic visual y actualiza localStorage para el monitor
     const button = document.querySelector(`.demo-controls-container .control-button[data-command-id="${move.status_clave}"]`);
     if (button) {
       button.classList.add('is-active');
-      localStorage.setItem('lastCommand', commandString);
+      localStorage.setItem('lastCommand', commandString); // Actualiza último comando
       
-      // Actualiza logs para el monitor (sincronizado)
+      // Actualiza el log de movimientos en localStorage
       const log = JSON.parse(localStorage.getItem('lastMovementsLog') || '[]');
-      log.push(commandString);
+      log.push(commandString); 
       if (log.length > 10) log.shift();
       localStorage.setItem('lastMovementsLog', JSON.stringify(log));
+      // Dispara evento para monitor.js en la misma pestaña (si aplica)
       window.dispatchEvent(new StorageEvent('storage', { key: 'lastMovementsLog', newValue: JSON.stringify(log) }));
+
       
-      // Esperar a que la animación termine
-      await sleep(300);
-      // Checkpoint 2: Salir si se pausó durante la animación
-      if (demoRunState !== 'running') return;
+      // ==========================================================
+      // ===== INICIO DE LA MODIFICACIÓN (FIX PROBLEMA 2) =====
+      // ==========================================================
+      // AÑADIR ESTA LLAMADA A LA API PARA REGISTRAR EL MOVIMIENTO
+      const apiData = {
+          p_nombre_dispositivo: dispositivoNombre,
+          p_status_clave: move.status_clave,
+          tipo_evento: 'Operacion' 
+      };
+  
+      fetch(`${apiBaseUrl}/registrar-evento`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(apiData),
+      })
+      .then(response => response.json())
+      .then(data => {
+          if(data.success) {
+              console.log(`Paso de demo [${commandString}] registrado en BD.`);
+          } else {
+              console.error("Error al registrar paso de demo en BD:", data.error);
+          }
+      })
+      .catch(error => {
+          console.error('Error de conexión al registrar paso de demo:', error);
+      });
+      // ==========================================================
+      // ===== FIN DE LA MODIFICACIÓN =====
+      // ==========================================================
+
+
+      await sleep(300); // Duración animación
       button.classList.remove('is-active');
     }
     
-    // --- PASO 3: ESPERAR DURACIÓN DEL MOVIMIENTO (Tiempo Límite) ---
-    const duracionMovimiento = 2000; // 2 segundos
-    await sleep(duracionMovimiento);
-    // Checkpoint 3: Salir si se pausó durante el movimiento
-    if (demoRunState !== 'running') return;
+    await sleep(4200); // Pausa entre movimientos
 
-    // --- PASO 4: ENVIAR "DETENER" (A MENOS QUE EL MOVIMIENTO YA FUERA "DETENER") ---
-    if (move.status_clave !== 3) { // 3 es la clave de "Detener"
-      await sendDemoCommandToApi(stopCommand);
-      // Checkpoint 4: Salir si se pausó durante el envío de "Detener"
-      if (demoRunState !== 'running') return;
+    currentDemoIndex++; // Avanza al siguiente paso
 
-      const stopButton = document.querySelector(`.demo-controls-container .control-button[data-command-id="3"]`);
-      if (stopButton) {
-        stopButton.classList.add('is-active');
-        localStorage.setItem('lastCommand', "Detener (Demo)"); // Actualiza monitor
-        await sleep(100);
-        // No necesitamos un checkpoint aquí, es la última acción del bloque
-        stopButton.classList.remove('is-active');
-      }
-    }
-
-    // --- PASO 5: PAUSA CORTA ENTRE MOVIMIENTOS ---
-    await sleep(500); // 0.5s de pausa antes del siguiente comando
-    // Checkpoint 5: Salir si se pausó durante la pausa final
-    if (demoRunState !== 'running') return;
-
-    // --- PASO 6: IR AL SIGUIENTE PASO ---
-    currentDemoIndex++; 
+    // Llama al siguiente paso (si no se ha pausado/detenido mientras dormía)
     if (demoRunState === 'running') {
         runDemoStep(); 
     }
   }
-  
-  // ===================================================================
-  // ===== FIN DE LA FUNCIÓN MODIFICADA =====
-  // ===================================================================
-
 
   /**
    * Se llama cuando la demo se completa con éxito (actualiza la API)
-   * (Esta función no tiene cambios)
    */
   async function finishDemo() {
-    console.log("Demo finalizada. Enviando comando 'Detener' final.");
-
-    await sendDemoCommandToApi(stopCommand);
-    
+    console.log("Demo finalizada.");
     localStorage.setItem('lastCommand', 'Demo finalizada.');
     
     if (currentExecutionId) {
@@ -519,6 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
     log.push(`${currentRunningDemo.name} (Finalizada)`); 
     if (log.length > 20) log.shift();
     localStorage.setItem('demoHistoryLog', JSON.stringify(log));
+    // Dispara evento para monitor.js en la misma pestaña (si aplica)
     window.dispatchEvent(new StorageEvent('storage', { key: 'demoHistoryLog', newValue: JSON.stringify(log) }));
 
 
@@ -531,15 +502,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Pausa la demo en ejecución (actualiza la API)
-   * (Esta función no tiene cambios)
    */
   async function pauseDemo() {
     if (demoRunState !== 'running' || !currentExecutionId) return;
     
-    // ¡ESTO ES LO IMPORTANTE!
-    // Al cambiar el estado, los 'checkpoints' en runDemoStep
-    // se activarán y la función dejará de ejecutarse.
-    demoRunState = 'paused'; 
+    demoRunState = 'paused';
     localStorage.setItem('lastCommand', 'Demo pausada.');
     console.log("Demo pausada en el paso:", currentDemoIndex);
     
@@ -550,7 +517,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Reanuda la demo pausada (actualiza la API)
-   * (Esta función no tiene cambios)
    */
   async function resumeDemo() {
     if (demoRunState !== 'paused' || !currentExecutionId) return;
@@ -559,38 +525,32 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem('lastCommand', 'Demo reanudada.');
     console.log("Reanudando demo desde el paso:", currentDemoIndex);
 
-    await updateDemoStatusInApi('Iniciada', currentDemoIndex);
+    await updateDemoStatusInApi('Iniciada', currentDemoIndex); // 'Iniciada' se usa para reanudar
     
     setDemoUI('running');
-    runDemoStep(); // ¡Esto inicia UN solo loop nuevo!
+    runDemoStep(); // Continúa desde el paso actual
   }
 
   /**
    * Finaliza (detiene) la demo actual (actualiza la API)
-   * (Esta función no tiene cambios)
    */
   async function stopDemo() {
     if (demoRunState === 'stopped' || !currentExecutionId) return;
     
     const wasPaused = demoRunState === 'paused';
-    
-    // ¡ESTO ES LO IMPORTANTE!
-    // Al cambiar el estado, los 'checkpoints' en runDemoStep
-    // se activarán y la función dejará de ejecutarse.
-    demoRunState = 'stopped'; 
-    
+    demoRunState = 'stopped';
     localStorage.setItem('lastCommand', 'Demo detenida.');
     console.log("Demo detenida por el usuario en el paso:", currentDemoIndex);
-
-    await sendDemoCommandToApi(stopCommand);
 
     await updateDemoStatusInApi('Cancelada', currentDemoIndex); 
 
     const log = JSON.parse(localStorage.getItem('demoHistoryLog') || '[]');
+    // Asegurarse de tener el nombre correcto
     const demoName = currentRunningDemo ? currentRunningDemo.name : "Demo desconocida"; 
     log.push(`${demoName} (Cancelada)`); 
     if (log.length > 20) log.shift();
     localStorage.setItem('demoHistoryLog', JSON.stringify(log));
+    // Dispara evento para monitor.js en la misma pestaña (si aplica)
      window.dispatchEvent(new StorageEvent('storage', { key: 'demoHistoryLog', newValue: JSON.stringify(log) }));
     
     currentDemoIndex = 0;
@@ -601,7 +561,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Función auxiliar para llamar al endpoint de actualización de estado
-   * (Esta función no tiene cambios)
    */
   async function updateDemoStatusInApi(status, step) {
       if (!currentExecutionId) return;
@@ -631,7 +590,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // --- Asignación de Eventos Inicial ---
-  // (Esta sección no tiene cambios)
 
   allDemoButtons.forEach(button => {
     const commandId = parseInt(button.dataset.commandId, 10);
@@ -649,7 +607,7 @@ document.addEventListener("DOMContentLoaded", () => {
   stopDemoButton.addEventListener("click", stopDemo);
 
   // --- Carga Inicial ---
-  loadSavedDemos();
+  loadSavedDemos(); // Carga demos DESDE LA API al iniciar
   renderMovesList(); 
   setDemoUI('stopped'); 
 });
