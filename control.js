@@ -17,7 +17,13 @@ document.addEventListener("DOMContentLoaded", () => {
     { status_clave: 10, status_texto: "Giro 360° derecha" },
     { status_clave: 11, status_texto: "Giro 360° izquierda" },
   ];
+// 1. Obtener el comando y el botón de "Detener"
+  const stopCommand = commands.find(c => c.status_clave === 3);
+  const stopButtonElement = document.querySelector(".control-button[data-command-id='3']");
 
+  // 2. Definir qué botones son de "movimiento continuo"
+  // (Adelante, Atrás, Diagonales)
+  const continuousMoveIds = [1, 2, 4, 5, 6, 7];
   // Obtener referencias a los elementos del DOM
   const allButtons = document.querySelectorAll(".control-button[data-command-id]");
   let activeCommandTimer = null;
