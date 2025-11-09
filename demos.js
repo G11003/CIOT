@@ -464,7 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
       button.classList.remove('is-active');
     }
     
-    await sleep(4200); // Pausa entre movimientos
+    await sleep(1500); // Pausa entre movimientos
 
     currentDemoIndex++; // Avanza al siguiente paso
 
