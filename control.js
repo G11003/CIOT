@@ -94,8 +94,42 @@ document.addEventListener("DOMContentLoaded", () => {
   allButtons.forEach(button => {
     const commandId = parseInt(button.dataset.commandId, 10);
     const command = commands.find(c => c.status_clave === commandId);
+if (!command) return;
 
-    if (command) {
+    // Si es un botón de MOVIMIENTO CONTINUO...
+    if (continuousMoveIds.includes(commandId)) {
+      
+      // --- Eventos de Mouse ---
+      button.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        handleCommand(command, button);
+      });
+      
+      button.addEventListener("mouseup", (e) => {
+        e.preventDefault();
+        handleCommand(stopCommand, stopButtonElement);
+      });
+      
+      // Por si el usuario saca el mouse del botón mientras presiona
+      button.addEventListener("mouseleave", (e) => {
+        if (e.buttons === 1) { // 1 = clic izquierdo presionado
+          handleCommand(stopCommand, stopButtonElement);
+        }
+      });
+
+      // --- Eventos Táctiles (Móvil) ---
+      button.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        handleCommand(command, button);
+      }, { passive: false });
+      
+      button.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        handleCommand(stopCommand, stopButtonElement);
+      });
+      
+    } else {
+
       button.addEventListener("click", () => {
         handleCommand(command, button);
       });
