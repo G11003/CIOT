@@ -16,6 +16,33 @@ CORS(app)
 # ***** INICIALIZAR SOCKETIO *****
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet') # Permite conexiones de cualquier origen
 
+# ... (después de inicializar socketio)
+
+# --- MAPA DE COMANDOS ---
+# Traduce el "status_clave" del frontend (web)
+# al "command" que espera el MOV.ino (robot)
+COMANDO_MAP = {
+    # Movimiento Básico
+    1: "F",  # Adelante
+    2: "B",  # Atrás
+    3: "S",  # Detener
+    # Diagonales (Veer)
+    4: "I",  # Vuelta adelante derecha (Web) -> ForwardRight (Arduino)
+    5: "G",  # Vuelta adelante izquierda (Web) -> ForwardLeft (Arduino)
+    6: "J",  # Vuelta atrás derecha (Web) -> BackwardRight (Arduino)
+    7: "H",  # Vuelta atrás izquierda (Web) -> BackwardLeft (Arduino)
+    # Giros con Tiempo (90 grados)
+    8: "G90R", # Giro 90 derecha
+    9: "G90L", # Giro 90 izquierda
+    # Giros con Tiempo (360 grados)
+    10: "G360R", # Giro 360 derecha
+    11: "G360L", # Giro 360 izquierda
+}
+# --------------------------
+
+# ... (resto de funciones auxiliares)
+
+
 # --- Configuración de la Base de Datos ---
 db_config = {
     'host': os.environ.get('DB_HOST', 'db-iot.ctce8ue4icnc.us-east-1.rds.amazonaws.com'),
@@ -80,6 +107,24 @@ def registrar_evento():
 
     if evento_tipo == 'Operacion':
         proc_name = 'sp_registrar_operacion'
+
+        try:
+                    # 1. Obtener la clave numérica del comando
+                    clave_comando_web = int(data.get('p_status_clave'))
+
+                    # 2. Traducir la clave al comando del robot (letra)
+                    comando_robot = COMANDO_MAP.get(clave_comando_web)
+
+                    if comando_robot:
+                        # 3. Emitir el comando al robot
+                        print(f"Enviando comando al robot: {comando_robot}")
+                        socketio.emit('robot_command', comando_robot) 
+                    else:
+                        print(f"Advertencia: Clave {clave_comando_web} no tiene comando de robot.")
+
+        except Exception as e:
+                print(f"Error al emitir comando de robot: {e}")
+
     elif evento_tipo == 'Obstaculo':
         proc_name = 'sp_registrar_obstaculo'
     else:
