@@ -396,12 +396,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // ==========================================================
         // ===== ¡INICIO DE LA MODIFICACIÓN! =====
         // Avisar a la pestaña de Demos que debe reanudar.
-        console.log("MONITOR: Enviando señal 'resume_demo' a la pestaña de Demos.");
-        localStorage.setItem('iot_resume_command', 'resume_after_evasion');
-        window.dispatchEvent(new StorageEvent('storage', { 
-            key: 'iot_resume_command', 
-            newValue: 'resume_after_evasion' 
-        }));
+  console.log("MONITOR: Enviando señal 'request_demo_resume' al servidor.");
+        socket.emit('request_demo_resume', { status: 'resume_after_evasion' });
         // ===== ¡FIN DE LA MODIFICACIÓN! =====
         // ==========================================================
     })
