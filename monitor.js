@@ -111,6 +111,11 @@ document.addEventListener("DOMContentLoaded", () => {
       
       // Re-evaluar la acción de obstáculo
       updateObstacleAction(statusString);
+      localStorage.setItem('iot_last_obstacle', statusString);
+    window.dispatchEvent(new StorageEvent('storage', { 
+        key: 'iot_last_obstacle', 
+        newValue: statusString 
+    }));
     }
   }
   

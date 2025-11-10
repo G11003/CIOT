@@ -649,6 +649,37 @@ document.addEventListener("DOMContentLoaded", () => {
   resumeDemoButton.addEventListener("click", resumeDemo);
   stopDemoButton.addEventListener("click", stopDemo);
 
+
+  // EN: demos.js
+
+  // ... (justo antes de la "Carga Inicial") ...
+
+  // ==============================================================
+  // --- ¡NUEVO! Listener para Pausa Automática por Obstáculo ---
+  // ==============================================================
+  window.addEventListener('storage', (event) => {
+    // Escuchar solo el evento que nos interesa
+    if (event.key !== 'iot_last_obstacle') return;
+
+    const obstacleStatus = event.newValue || "";
+    const isAnObstacle = obstacleStatus.toLowerCase().includes('obstáculo');
+    const isNotSinObstaculos = !obstacleStatus.includes('(5)'); // 5 = Sin Obstáculos
+
+    // Solo actuar si:
+    // 1. Una demo se está ejecutando ('running')
+    // 2. El evento es un obstáculo real (no es "Sin Obstáculos")
+    // 3. El toggle de Evasión Autónoma NO está marcado (Modo Manual)
+    if (demoRunState === 'running' && isAnObstacle && isNotSinObstaculos && !autoEvasionToggle.checked) {
+      
+      console.log(`DEMO: Obstáculo [${obstacleStatus}] detectado por el monitor.`);
+      console.log("DEMO: Modo Manual detectado. Pausando automáticamente.");
+      
+      // ¡Llama a la misma función que usa el botón de Pausa!
+      pauseDemo();
+    }
+  });
+
+
   // --- Carga Inicial ---
   loadSavedDemos();
   renderMovesList(); 
