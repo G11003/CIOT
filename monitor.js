@@ -111,11 +111,17 @@ document.addEventListener("DOMContentLoaded", () => {
       
       // Re-evaluar la acción de obstáculo
       updateObstacleAction(statusString);
+
+      // =============================================
+      // ===== ¡INICIO DE LA MODIFICACIÓN! =====
+      // Notificar a otras pestañas (demos.js) que se vio un obstáculo
       localStorage.setItem('iot_last_obstacle', statusString);
-    window.dispatchEvent(new StorageEvent('storage', { 
-        key: 'iot_last_obstacle', 
-        newValue: statusString 
-    }));
+      window.dispatchEvent(new StorageEvent('storage', { 
+          key: 'iot_last_obstacle', 
+          newValue: statusString 
+      }));
+      // ===== ¡FIN DE LA MODIFICACIÓN! =====
+      // =============================================
     }
   }
   
@@ -386,6 +392,18 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .then(data => {
         console.log("MODO REAL: Acción de evasión registrada en BD.");
+        
+        // ==========================================================
+        // ===== ¡INICIO DE LA MODIFICACIÓN! =====
+        // Avisar a la pestaña de Demos que debe reanudar.
+        console.log("MONITOR: Enviando señal 'resume_demo' a la pestaña de Demos.");
+        localStorage.setItem('iot_resume_command', 'resume_after_evasion');
+        window.dispatchEvent(new StorageEvent('storage', { 
+            key: 'iot_resume_command', 
+            newValue: 'resume_after_evasion' 
+        }));
+        // ===== ¡FIN DE LA MODIFICACIÓN! =====
+        // ==========================================================
     })
     .catch(error => {
         console.error('Error de API en Evasión (MODO REAL):', error);
@@ -395,12 +413,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- START ---
   
-  // Asigna el evento al botón
-  executeObstacleActionBtnEl.addEventListener('click', executeRecommendedAction);
-// EN: monitor.js
-
-  // ... (justo antes de "loadInitialData();") ...
-
   // ==============================================================
   // --- ¡NUEVO! Listener para sincronizar estado con otras pestañas ---
   // ==============================================================
@@ -411,9 +423,6 @@ document.addEventListener("DOMContentLoaded", () => {
       lastCommandTextEl.textContent = event.newValue;
     }
   });
-
-
-  // --- START ---
   
   // Asigna el evento al botón
   executeObstacleActionBtnEl.addEventListener('click', executeRecommendedAction);

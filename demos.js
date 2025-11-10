@@ -857,7 +857,34 @@ function handleAutoEvasionPause() {
     }, EVASION_TIME_ESTIMATE_MS);
   }
   
-  
+  window.addEventListener('storage', (event) => {
+      // 1. Escuchar solo el comando de reanudar
+      if (event.key !== 'iot_resume_command') {
+        return;
+      }
+    
+      // 2. Solo actuar si la demo está en 'pausa' (modo manual)
+      if (demoRunState === 'paused') {
+        console.log("DEMO: Señal 'resume_demo' recibida desde el monitor.");
+        
+        // ==========================================================
+        // ===== ¡INICIO DE LA MODIFICACIÓN CLAVE! =====
+        // ¡Saltar el paso que falló!
+        // El robot ya evadió, así que pasamos al siguiente movimiento.
+        console.log(`DEMO: Saltando paso ${currentDemoIndex} (que falló).`);
+        currentDemoIndex++; 
+        // ===== ¡FIN DE LA MODIFICACIÓN CLAVE! =====
+        // ==========================================================
+
+        console.log("DEMO: Reanudando demo después de evasión manual...");
+        
+        // 3. ¡Llamar a la función de reanudar!
+        resumeDemo();
+        
+        // 4. Limpiar el comando
+        localStorage.removeItem('iot_resume_command');
+      }
+  });
   // --- Carga Inicial ---
   loadSavedDemos();
   renderMovesList(); 
