@@ -780,10 +780,28 @@ function handleAutoEvasionPause() {
     console.log('DEMO: Desconectado del servidor WebSocket.');
   });
 
-  /**
-   * ¡Función clave! Escucha los eventos del monitor
-   * para reaccionar a los obstáculos.
-   */
+socket.on('force_demo_resume', (data) => {
+    if (data && data.action === 'resume') {
+      console.log("DEMO: Señal 'force_demo_resume' recibida del servidor.");
+      
+      // Solo actuar si la demo está en 'pausa' (modo manual)
+      if (demoRunState === 'paused') {
+        
+        // ¡Saltar el paso que falló!
+        // El robot ya evadió, así que pasamos al siguiente movimiento.
+        console.log(`DEMO: Saltando paso ${currentDemoIndex} (que falló).`);
+        currentDemoIndex++; 
+        
+        console.log("DEMO: Reanudando demo después de evasión manual...");
+        
+        // ¡Llamar a la función de reanudar!
+        resumeDemo();
+        
+      } else {
+        console.warn(`DEMO: 'force_demo_resume' recibido, pero el estado no era 'paused' (era '${demoRunState}'). Ignorando.`);
+      }
+    }
+  });
   socket.on('update_monitor', (data) => {
     // 1. Solo nos importan los obstáculos
     if (!data || data.tipo !== 'Obstaculo') {
@@ -857,34 +875,7 @@ function handleAutoEvasionPause() {
     }, EVASION_TIME_ESTIMATE_MS);
   }
   
-  window.addEventListener('storage', (event) => {
-      // 1. Escuchar solo el comando de reanudar
-      if (event.key !== 'iot_resume_command') {
-        return;
-      }
-    
-      // 2. Solo actuar si la demo está en 'pausa' (modo manual)
-      if (demoRunState === 'paused') {
-        console.log("DEMO: Señal 'resume_demo' recibida desde el monitor.");
-        
-        // ==========================================================
-        // ===== ¡INICIO DE LA MODIFICACIÓN CLAVE! =====
-        // ¡Saltar el paso que falló!
-        // El robot ya evadió, así que pasamos al siguiente movimiento.
-        console.log(`DEMO: Saltando paso ${currentDemoIndex} (que falló).`);
-        currentDemoIndex++; 
-        // ===== ¡FIN DE LA MODIFICACIÓN CLAVE! =====
-        // ==========================================================
 
-        console.log("DEMO: Reanudando demo después de evasión manual...");
-        
-        // 3. ¡Llamar a la función de reanudar!
-        resumeDemo();
-        
-        // 4. Limpiar el comando
-        localStorage.removeItem('iot_resume_command');
-      }
-  });
   // --- Carga Inicial ---
   loadSavedDemos();
   renderMovesList(); 
