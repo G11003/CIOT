@@ -397,6 +397,26 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Asigna el evento al botón
   executeObstacleActionBtnEl.addEventListener('click', executeRecommendedAction);
+// EN: monitor.js
+
+  // ... (justo antes de "loadInitialData();") ...
+
+  // ==============================================================
+  // --- ¡NUEVO! Listener para sincronizar estado con otras pestañas ---
+  // ==============================================================
+  window.addEventListener('storage', (event) => {
+    // Si la pestaña de Demos actualiza el 'lastCommand', que esta
+    // pestaña (Monitor) también lo muestre.
+    if (event.key === 'lastCommand' && lastCommandTextEl) {
+      lastCommandTextEl.textContent = event.newValue;
+    }
+  });
+
+
+  // --- START ---
+  
+  // Asigna el evento al botón
+  executeObstacleActionBtnEl.addEventListener('click', executeRecommendedAction);
   
   // Carga los datos desde la API al iniciar
   loadInitialData();

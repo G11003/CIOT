@@ -679,7 +679,79 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+// EN: demos.js
 
+  // ... (justo antes de "--- Carga Inicial ---") ...
+
+// ==============================================================
+// --- ¡NUEVO! Listener para Pausa Automática por Obstáculo ---
+// ==============================================================
+window.addEventListener('storage', (event) => {
+  // 1. Escuchar solo el evento que nos interesa
+  if (event.key !== 'iot_last_obstacle') return;
+
+  // 2. Solo actuar si una demo está en curso
+  if (demoRunState !== 'running') return;
+
+  const obstacleStatus = event.newValue || "";
+  const isAnObstacle = obstacleStatus.toLowerCase().includes('obstáculo');
+  const isNotSinObstaculos = !obstacleStatus.includes('(5)'); // 5 = Sin Obstáculos
+
+  // 3. Si no es un obstáculo real, ignorarlo
+  if (!isAnObstacle || !isNotSinObstaculos) return;
+
+  // 4. ¡Obstáculo detectado! Decidir qué hacer:
+  const isAutoMode = autoEvasionToggle.checked;
+
+  if (isAutoMode) {
+    // ----- MODO AUTO -----
+    // Pausa la demo, espera un tiempo y reanuda solo
+    console.log(`DEMO: Obstáculo [${obstacleStatus}] detectado.`);
+    console.log("DEMO: Modo Auto. Pausando y esperando evasión...");
+    handleAutoEvasionPause();
+  } else {
+    // ----- MODO MANUAL -----
+    // Simplemente pausa la demo y espera al usuario
+    console.log(`DEMO: Obstáculo [${obstacleStatus}] detectado.`);
+    console.log("DEMO: Modo Manual. Pausando automáticamente.");
+    pauseDemo();
+  }
+});
+
+/**
+ * (¡NUEVA FUNCIÓN!)
+ * Pausa la demo, espera un tiempo FIJO (simulando la evasión)
+ * y luego la reanuda.
+ */
+function handleAutoEvasionPause() {
+  const EVASION_TIME_ESTIMATE_MS = 5000; // 5 segundos
+
+  // 1. Poner la UI en modo "Evadiendo"
+  demoRunState = 'evading';
+  setDemoUI('evading');
+  
+  // 2. Actualizar el monitor para que muestre "Evadiendo"
+  localStorage.setItem('lastCommand', 'Evadiendo (Auto)...');
+  window.dispatchEvent(new StorageEvent('storage', { key: 'lastCommand' }));
+
+
+  // 3. ¡IMPORTANTE! Saltarnos el "Stop" del comando actual.
+  // Asumimos que el "Adelante" falló, así que pasamos al SIGUIENTE comando.
+  currentDemoIndex++; 
+
+  // 4. Esperar a que la evasión termine (simulación)
+  setTimeout(() => {
+    if (demoRunState !== 'evading') return; // Salir si el usuario la canceló
+    
+    console.log("DEMO: Evasión (auto) completada (estimada). Reanudando...");
+    
+    // 5. Volver al estado 'running' y continuar la demo
+    demoRunState = 'running';
+    setDemoUI('running');
+    runDemoStep(); // Continúa con el siguiente paso (ej: "Giro")
+
+  }, EVASION_TIME_ESTIMATE_MS);
+}
   // --- Carga Inicial ---
   loadSavedDemos();
   renderMovesList(); 
