@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   
-  // ===== INICIO DE LA MODIFICACIÓN =====
-  // Pega esta línea aquí:
   const apiBaseUrl = 'http://54.161.121.152:5500'; 
-  // Definición de comandos
+  
+  // ===== 1. AÑADIMOS NUEVOS COMANDOS DE VELOCIDAD =====
+  // (Claves 21-24 para no chocar con las claves 12-16 de evasión)
   const commands = [
     { status_clave: 1, status_texto: "Adelante" },
     { status_clave: 2, status_texto: "Atrás" },
@@ -16,20 +16,54 @@ document.addEventListener("DOMContentLoaded", () => {
     { status_clave: 9, status_texto: "Giro 90° izquierda" },
     { status_clave: 10, status_texto: "Giro 360° derecha" },
     { status_clave: 11, status_texto: "Giro 360° izquierda" },
+    // --- Nuevos comandos de velocidad ---
+    { status_clave: 21, status_texto: "Adelante (Baja)" },
+    { status_clave: 22, status_texto: "Adelante (Alta)" },
+    { status_clave: 23, status_texto: "Atrás (Baja)" },
+    { status_clave: 24, status_texto: "Atrás (Alta)" },
   ];
-// 1. Obtener el comando y el botón de "Detener"
+  // ----------------------------------------------------
+
+  // 1. Obtener el comando y el botón de "Detener"
   const stopCommand = commands.find(c => c.status_clave === 3);
   const stopButtonElement = document.querySelector(".control-button[data-command-id='3']");
 
   // 2. Definir qué botones son de "movimiento continuo"
-  // (Adelante, Atrás, Diagonales)
   const continuousMoveIds = [1, 2, 4, 5, 6, 7];
+  
   // Obtener referencias a los elementos del DOM
   const allButtons = document.querySelectorAll(".control-button[data-command-id]");
   let activeCommandTimer = null;
 
+  // ===== 2. VARIABLE GLOBAL PARA VELOCIDAD =====
+  let currentSpeedLevel = 'moderada'; // Valor inicial
+  // ---------------------------------------------
+
   // Función para manejar el clic de un comando
   const handleCommand = (command, buttonElement) => {
+    
+    // ===== 3. LÓGICA DE RE-MAPEO DE COMANDO =====
+    let finalCommand = command; // Empezar con el comando base (ej: Adelante)
+    const baseCommandId = command.status_clave;
+    
+    // Solo re-mapeamos Adelante (1) y Atrás (2)
+    if (currentSpeedLevel === 'baja') {
+        if (baseCommandId === 1) { // Adelante
+            finalCommand = commands.find(c => c.status_clave === 21); // Adelante (Baja)
+        } else if (baseCommandId === 2) { // Atrás
+            finalCommand = commands.find(c => c.status_clave === 23); // Atrás (Baja)
+        }
+    } else if (currentSpeedLevel === 'alta') {
+        if (baseCommandId === 1) { // Adelante
+            finalCommand = commands.find(c => c.status_clave === 22); // Adelante (Alta)
+        } else if (baseCommandId === 2) { // Atrás
+            finalCommand = commands.find(c => c.status_clave === 24); // Atrás (Alta)
+        }
+    }
+    // Si la velocidad es "moderada", finalCommand sigue siendo el comando original.
+    // Si es un giro (ej: ID 8), también permanece original.
+    // ------------------------------------------------
+
     
     if (activeCommandTimer) {
       clearTimeout(activeCommandTimer);
@@ -40,18 +74,18 @@ document.addEventListener("DOMContentLoaded", () => {
     buttonElement.classList.add("is-active");
 
     // 2. ***** ¡MODIFICADO! Llamada a la API *****
-    const commandString = `${command.status_texto} (${command.status_clave})`;
+    // (Usa finalCommand en lugar de command)
+    const commandString = `${finalCommand.status_texto} (${finalCommand.status_clave})`;
     console.log("Enviando comando:", commandString);
     
-    // Prepara el cuerpo de la solicitud para la API
     const apiData = {
         p_nombre_dispositivo: 'Robot Explorador v1',
-        p_status_clave: command.status_clave,
-        tipo_evento: 'Operacion' // Le decimos al endpoint qué SP usar
+        p_status_clave: finalCommand.status_clave, // <-- ¡USA LA CLAVE FINAL!
+        tipo_evento: 'Operacion'
     };
 
     // Llama al backend
-    fetch('http://54.161.121.152:5500/registrar-evento', {
+    fetch(`${apiBaseUrl}/registrar-evento`, { // <-- Usa la variable apiBaseUrl
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -94,46 +128,52 @@ document.addEventListener("DOMContentLoaded", () => {
   allButtons.forEach(button => {
     const commandId = parseInt(button.dataset.commandId, 10);
     const command = commands.find(c => c.status_clave === commandId);
-if (!command) return;
+    if (!command) return;
 
-    // Si es un botón de MOVIMIENTO CONTINUO...
     if (continuousMoveIds.includes(commandId)) {
-      
       // --- Eventos de Mouse ---
       button.addEventListener("mousedown", (e) => {
         e.preventDefault();
         handleCommand(command, button);
       });
-      
       button.addEventListener("mouseup", (e) => {
         e.preventDefault();
         handleCommand(stopCommand, stopButtonElement);
       });
-      
-      // Por si el usuario saca el mouse del botón mientras presiona
       button.addEventListener("mouseleave", (e) => {
-        if (e.buttons === 1) { // 1 = clic izquierdo presionado
+        if (e.buttons === 1) {
           handleCommand(stopCommand, stopButtonElement);
         }
       });
-
       // --- Eventos Táctiles (Móvil) ---
       button.addEventListener("touchstart", (e) => {
         e.preventDefault();
         handleCommand(command, button);
       }, { passive: false });
-      
       button.addEventListener("touchend", (e) => {
         e.preventDefault();
         handleCommand(stopCommand, stopButtonElement);
       });
-      
     } else {
-
       button.addEventListener("click", () => {
         handleCommand(command, button);
       });
     }
   });
 
-}); 
+  // ===== 4. AÑADIR EVENT LISTENERS PARA BOTONES DE VELOCIDAD =====
+  const speedButtons = document.querySelectorAll(".speed-button");
+  speedButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Quitar 'is-active' de todos
+      speedButtons.forEach(b => b.classList.remove('is-active'));
+      // Añadir 'is-active' al presionado
+      btn.classList.add('is-active');
+      // Actualizar la variable global
+      currentSpeedLevel = btn.dataset.speedLevel;
+      console.log("Nivel de velocidad fijado a:", currentSpeedLevel);
+    });
+  });
+  // --------------------------------------------------------------
+
+});

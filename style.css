@@ -994,3 +994,32 @@ select.demo-input {
   accent-color: var(--primary);
   cursor: pointer;
 }
+.speed-control-wrapper {
+  display: flex;
+  width: fit-content;
+  margin: 1.5rem auto 0 auto; /* Centrado y con espacio superior */
+  background-color: oklch(0.05 0 0); /* Fondo un poco más claro que la tarjeta */
+  border: 1px solid var(--border);
+  border-radius: 1rem; /* Radio grande para el contenedor */
+  padding: 0.25rem; /* Pequeño padding interno */
+  box-shadow: 0 4px 10px oklch(var(--background) / 0.5);
+}
+
+.speed-button {
+  background: transparent;
+  border: none;
+  font-family: monospace;
+  font-size: 0.875rem; /* 14px */
+  font-weight: 700;
+  color: var(--muted-foreground);
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.75rem; /* Radio más pequeño para el botón */
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+}
+
+.speed-button.is-active {
+  background-color: var(--primary);
+  color: var(--background);
+  box-shadow: 0 0 15px oklch(var(--primary) / 0.3);
+}

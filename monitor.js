@@ -16,7 +16,11 @@ document.addEventListener("DOMContentLoaded", () => {
     { status_clave: 13, status_texto: "Evasión: Giro 90° izquierda" },
     { status_clave: 14, status_texto: "Evasión: Giro 90° derecha" },
     { status_clave: 15, status_texto: "Evasión: Retroceso Corto y Giro Izq" },
-    { status_clave: 16, status_texto: "Evasión: Retroceso Corto y Giro Der" }
+    { status_clave: 16, status_texto: "Evasión: Retroceso Corto y Giro Der" },
+    { status_clave: 21, status_texto: "Adelante (Baja)" },
+    { status_clave: 22, status_texto: "Adelante (Alta)" },
+    { status_clave: 23, status_texto: "Atrás (Baja)" },
+    { status_clave: 24, status_texto: "Atrás (Alta)" },
   ];
 
   const apiBaseUrl = 'http://54.161.121.152:5500';

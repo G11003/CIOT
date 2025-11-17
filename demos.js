@@ -14,13 +14,18 @@ document.addEventListener("DOMContentLoaded", () => {
     { status_clave: 9, status_texto: "Giro 90° izquierda" },
     { status_clave: 10, status_texto: "Giro 360° derecha" },
     { status_clave: 11, status_texto: "Giro 360° izquierda" },
-    // Nuevos comandos de modo
+
     { status_clave: 100, status_texto: "SET_EVASION_MANUAL" },
     { status_clave: 101, status_texto: "SET_EVASION_AUTO" },
+
+    { status_clave: 21, status_texto: "Adelante (Baja)" },
+    { status_clave: 22, status_texto: "Adelante (Alta)" },
+    { status_clave: 23, status_texto: "Atrás (Baja)" },
+    { status_clave: 24, status_texto: "Atrás (Alta)" },
   ];
 
   // Constantes de API
-  const apiBaseUrl = 'http://54.161.121.152:5500'; // URL de tu API
+  const apiBaseUrl = 'http://54.161.121.152:5500'; 
   const dispositivoNombre = 'Robot Explorador v1';
   const socket = io(apiBaseUrl);
 
@@ -841,10 +846,6 @@ socket.on('force_demo_resume', (data) => {
   });
 
 
-  /**
-   * (¡NUEVA FUNCIÓN!)
-   * Maneja la pausa y reanudación del modo AUTÓNOMO.
-   */
   function handleAutoEvasion() {
     // Estimación de cuánto tarda el robot en evadir
     const EVASION_TIME_ESTIMATE_MS = 5000; 
