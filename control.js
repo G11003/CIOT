@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   
-  const apiBaseUrl = 'http://3.238.124.43:5500'; 
+  const apiBaseUrl = 'http://98.88.1.17:5500'; 
   
   // ===== 1. AÑADIMOS NUEVOS COMANDOS DE VELOCIDAD =====
   // (Claves 21-24 para no chocar con las claves 12-16 de evasión)
@@ -178,4 +178,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 });
+
 
