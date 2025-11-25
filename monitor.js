@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { status_clave: 24, status_texto: "Atrás (Alta)" },
   ];
 
-  const apiBaseUrl = 'http://3.239.96.82:5500';
+  const apiBaseUrl = 'http://3.238.124.43:5500';
   const dispositivoNombre = 'Robot Explorador v1';
   const urlParams = `?dispositivo=${encodeURIComponent(dispositivoNombre)}`;
 
@@ -398,3 +398,4 @@ document.addEventListener("DOMContentLoaded", () => {
   
 
 });
+
