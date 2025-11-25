@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   // Constantes de API
-  const apiBaseUrl = 'http://3.238.124.43:5500'; 
+  const apiBaseUrl = 'http://98.88.1.17:5500'; 
   const dispositivoNombre = 'Robot Explorador v1';
   const socket = io(apiBaseUrl);
 
@@ -882,5 +882,6 @@ socket.on('force_demo_resume', (data) => {
   renderMovesList(); 
   setDemoUI('stopped'); 
 });
+
 
 
