@@ -5,7 +5,7 @@
      1rem pasará a valer ~10.7px. Todo tu diseño se encogerá
      proporcionalmente respetando la disposición.
   */
-  font-size: 67%; 
+  font-size: 62%; 
 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --background: oklch(0 0 0);
@@ -793,3 +793,4 @@ select.demo-input {
   color: var(--background);
   box-shadow: 0 0 15px oklch(var(--primary) / 0.3);
 }
+
