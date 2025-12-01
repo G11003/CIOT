@@ -1025,3 +1025,124 @@ select.demo-input {
 
 }
 
+/* ============================================================
+   SOLUCIÓN FINAL: ESCALA GLOBAL "ZOOM OUT" + AJUSTE DE PANTALLA
+   ============================================================ */
+
+/* 1. EL TRUCO DE LA ESCALA (MAGIA) */
+html {
+  /* Por defecto es 16px. Al ponerlo en 10px (aprox 62.5%), 
+     todo tu sitio se reduce al ~60% de su tamaño original. 
+     Esto imita exactamente el "Zoom" del navegador. */
+  font-size: 11px !important; 
+  
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden; /* Adiós scrollbars globales */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--background);
+  /* Aseguramos que el contenido se estire */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 2. NAVBAR AJUSTADA */
+.navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 5rem; /* Usamos rem para que también se escale */
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  z-index: 1000;
+  background-color: var(--card); /* Asegurar fondo opaco */
+}
+
+/* 3. CONTENEDOR PRINCIPAL */
+main {
+  /* Padding superior igual a la altura del navbar */
+  padding-top: 5rem; 
+  height: 100vh; 
+  width: 100%;
+  box-sizing: border-box;
+  /* El contenido interno tendrá un padding pequeño */
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* 4. AJUSTE DE MONITOR (GRID PERFECTO) */
+/* Esto fuerza a las cajas a ocupar exactamente la pantalla */
+.monitor-dashboard-grid {
+  display: grid;
+  height: 100%;
+  width: 100%;
+  gap: 1rem !important; /* Gap reducido */
+  
+  /* DEFINICIÓN DE ALTURAS DE FILA:
+     1. Estatus: 18% de la pantalla
+     2. Logs:    Espacio sobrante (el más grande)
+     3. Gestión: 15% de la pantalla
+  */
+  grid-template-rows: 18vh 1fr 15vh !important;
+  grid-template-columns: repeat(12, 1fr);
+  padding-bottom: 0.5rem;
+}
+
+/* Ajustes para que las cajas no se desborden */
+.monitor-status-box, .monitor-log-box {
+  min-height: 0; /* CRÍTICO: Permite que la caja se encoja si es necesario */
+  display: flex;
+  flex-direction: column;
+  padding: 1rem !important;
+}
+
+/* Textos que ocupan mucho espacio se reducen */
+.status-text-large {
+  font-size: 2rem !important; /* Gracias a la escala global, esto se verá moderado */
+  line-height: 1.2;
+}
+
+/* Listas con scroll interno, no de página */
+.monitor-log-list {
+  flex: 1;
+  overflow-y: auto;
+  height: 100% !important;
+}
+
+/* 5. AJUSTE DE DEMOS Y CONTROL */
+/* Hacemos que también respeten el alto */
+.control-panel-container, 
+.demo-layout-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Ajuste específico para Demos dividido en dos columnas */
+.demo-layout-container {
+  flex-direction: row;
+  gap: 1.5rem;
+  overflow: hidden;
+}
+
+.demo-run-section, .demo-create-section {
+  flex: 1; /* Reparten el espacio vertical equitativamente */
+  min-height: 0; /* Evita desborde */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Scroll interno para la lista de crear demos */
+.demo-moves-list {
+  flex: 1;
+  overflow-y: auto;
+}
