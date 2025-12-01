@@ -1029,135 +1029,133 @@ select.demo-input {
    PARCHE "NO-SCROLL": AJUSTE PERFECTO A PANTALLA (100vh)
    ================================================================= */
 
-/* 1. Forzamos al body y html a no exceder la ventana */
+/* =======================================================
+   CORRECCIÓN: AJUSTE COMPACTO "NO-SCROLL"
+   ======================================================= */
+
+/* 1. CONFIGURACIÓN DE PANTALLA COMPLETA */
 html, body {
-  height: 100vh;       /* Alto exacto de la ventana */
-  overflow: hidden;    /* Prohibido el scroll general */
-  padding-top: 0;      /* Quitamos el padding del body... */
+  height: 100vh;       /* Alto fijo de la ventana */
+  overflow: hidden;    /* Bloqueamos scroll de la página completa */
+  padding-top: 60px !important; /* Espacio exacto para la navbar reducida */
 }
 
-/* 2. Ajuste de la Navbar para que no empuje el contenido */
-.navbar {
-  position: static;    /* Ya no fixed, ahora es parte del flujo flex */
-  flex-shrink: 0;      /* La barra no se encoge */
-  height: 70px;        /* Altura controlada */
-  padding: 0 1rem;
-}
-
-/* 3. El contenedor principal ocupa TODO el espacio restante */
 main {
-  height: calc(100vh - 70px); /* Altura total menos la navbar */
-  padding: 10px 1rem;         /* Padding reducido */
-  justify-content: flex-start; /* Alineación superior */
-  overflow: hidden;
-}
-
-/* =================================================================
-   AJUSTES ESPECÍFICOS: PANEL DE CONTROL (control.html)
-   ================================================================= */
-
-.control-panel-container {
-  height: 100%;        /* Ocupar todo el alto del main */
+  height: 100%;        /* El main ocupa lo que resta de pantalla */
+  max-width: 100%;     /* Aprovechar todo el ancho */
+  padding: 10px;       /* Margen externo mínimo */
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Header arriba, Footer abajo, Controles al centro */
-  padding-bottom: 10px;
 }
 
-/* Reducimos los márgenes gigantes del header */
-.header {
-  margin-bottom: 1rem !important; /* Forzamos reducción de margen */
-  flex-shrink: 0;
-}
-.header h1 { font-size: 1.8rem; margin-bottom: 0.2rem; }
-
-/* Wrapper de controles flexible */
-.controls-wrapper {
-  flex: 1;              /* Crece para ocupar espacio disponible */
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Centrar verticalmente */
-  gap: 1rem !important;    /* Reducimos el gap de 3rem a 1rem */
-  min-height: 0;        /* Truco flexbox para evitar desbordamiento */
+/* 2. BARRA DE NAVEGACIÓN (Restaurada arriba pero delgada) */
+.navbar {
+  position: fixed;     /* Volvemos a fijarla arriba */
+  top: 0; left: 0; right: 0;
+  height: 60px;        /* Altura reducida (antes era implícita por padding) */
+  padding: 0 1rem;
+  z-index: 1000;
+  box-sizing: border-box;
 }
 
-/* Reducir tamaño de botones para que quepan */
-.control-button {
-  width: 5.5rem !important;  /* Un poco más chicos por defecto */
-  height: 5.5rem !important;
-  border-radius: 1rem;
+.navbar-list {
+  gap: 1rem;           /* Menos espacio entre enlaces */
 }
 
-.control-button .icon { font-size: 2rem !important; }
-
-/* Grid más compacto */
-.primary-movement-grid {
-  gap: 0.5rem !important;
-}
-
-.rotation-controls {
-  padding-top: 1rem !important;
-  margin-top: 0;
-}
-
-.footer {
-  margin-top: 0.5rem !important;
-  flex-shrink: 0;
-}
-
-/* Media Query: Si la pantalla es alta (escritorio grande), podemos agrandar un poco */
-@media (min-height: 800px) {
-  .control-button { width: 7rem !important; height: 7rem !important; }
-  .controls-wrapper { gap: 2rem !important; }
-}
-
-/* =================================================================
-   AJUSTES ESPECÍFICOS: MONITOR (monitor.html)
-   ================================================================= */
-
-/* Forzar que el grid ocupe exactamente el 100% del espacio disponible */
+/* 3. MONITOR COMPACTO (Ajuste de rejilla) */
 .monitor-dashboard-grid {
-  height: 100%;
-  grid-template-rows: auto 1fr auto !important; /* Fila media (logs) flexible */
-  gap: 1rem !important;
-  padding-bottom: 1rem;
+  /* Restamos el padding del main para calcular el alto */
+  height: 100%; 
+  gap: 0.5rem !important; /* Reducimos huecos entre cajas drasticamente */
+  
+  /* Definimos alturas de filas porcentuales para asegurar que quepan */
+  /* Fila 1 (Estatus): 15% del espacio
+     Fila 2 (Logs):    Espacio restante (flexible)
+     Fila 3 (Gestión): 15% del espacio */
+  grid-template-rows: 15vh 1fr 12vh !important; 
+  padding-bottom: 0;
 }
 
-/* Ajuste de las cajas para que no se desborden */
-.monitor-status-box, .monitor-log-box {
-  min-height: 0; /* Vital para grids anidados */
-  padding: 1rem !important;
-  overflow: hidden;
+/* Cajas del Monitor más pequeñas */
+.monitor-status-box, 
+.monitor-log-box {
+  padding: 0.5rem !important; /* Padding interno reducido */
+  border-radius: 0.75rem;     /* Bordes menos redondeados */
+  min-height: 0;              /* Importante para que no se desborden */
 }
 
-/* Títulos más compactos */
-.monitor-status-box h2, .monitor-log-box h2 {
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  padding-bottom: 0.5rem;
+/* Títulos más pequeños */
+.monitor-status-box h2, 
+.monitor-log-box h2 {
+  font-size: 0.9rem !important;
+  margin-bottom: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
 }
 
-/* Textos grandes ajustados */
+/* Texto de estatus gigante -> Reducido */
 .status-text-large {
-  font-size: 1.2rem !important; /* Reducir tamaño de fuente */
-  min-height: auto !important;
+  font-size: 1.1rem !important; 
+  min-height: 0 !important;
 }
 
-/* Altura automática de las listas (scroll interno, no de página) */
+/* Listas con scroll interno */
+.monitor-log-list {
+  font-size: 0.75rem !important; /* Texto de logs más pequeño */
+}
+
+/* Altura automática para las listas (llenan su caja) */
 #box-moves-log .monitor-log-list,
 #box-obstacles-log .monitor-log-list,
 #box-demos-log .monitor-log-list {
-  height: 100% !important; /* Usar el 100% de su caja contenedora */
-  max-height: none !important; /* Quitar límites fijos */
+  height: 100% !important;
+  max-height: none !important;
 }
 
-/* Ajuste botón gestión obstáculo */
+/* Botón y gestión de obstáculo compactos */
 #box-obstacle-mgmt {
-  flex-direction: row; /* Poner texto y botón lado a lado para ahorrar altura */
+  flex-direction: row; /* Poner en horizontal */
   align-items: center;
-  gap: 1rem;
+  justify-content: space-between;
 }
 .execute-action-btn {
   width: auto !important;
-  padding: 0.5rem 1.5rem;
+  padding: 0.5rem 1rem !important;
+  margin: 0 !important;
+  height: auto !important;
 }
+
+/* 4. PANEL DE CONTROL (Botones más pequeños) */
+.control-panel-container {
+  height: 100%;
+  padding-bottom: 10px;
+}
+
+.header {
+  margin-bottom: 0.5rem !important;
+}
+.header h1 { font-size: 1.5rem !important; }
+
+/* Wrapper flexible */
+.controls-wrapper {
+  gap: 0.5rem !important; 
+}
+
+/* Botones reducidos */
+.control-button {
+  width: 4rem !important;   /* De 6rem/8rem a 4rem */
+  height: 4rem !important;
+  border-radius: 0.8rem !important;
+}
+.control-button .icon {
+  font-size: 1.5rem !important;
+  margin-bottom: 0 !important;
+}
+.control-button .label {
+  display: none; /* Ocultar etiquetas para ahorrar espacio */
+}
+
+/* Ajuste de grids de control */
+.primary-movement-grid { gap: 0.25rem !important; }
+.rotation-grid { gap: 0.5rem !important; }
+
+.footer { margin-top: 0.5rem !important; font-size: 0.7rem; }
