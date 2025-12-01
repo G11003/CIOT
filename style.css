@@ -1,11 +1,6 @@
-/* ==========================================================================
-   CSS COMPLETO - VERSIÓN "NO SCROLL" & "ZOOM OUT" (ESCALA REDUCIDA)
-   ========================================================================== */
-
+/* --- Variables de Color (TU VERSIÓN) --- */
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  
-  /* --- COLORES --- */
   --background: oklch(0 0 0);
   --foreground: oklch(1 0 0);
   --card: oklch(0.1 0 0);
@@ -19,73 +14,64 @@
   --purple: oklch(63.708% 0.21862 298.316);
 }
 
-/* ==========================================================================
-   1. AJUSTE DE ESCALA GLOBAL (LA MAGIA)
-   ========================================================================== */
-html {
-  /* IMPORTANTE: 10px es aprox el 62.5% de 16px (estándar).
-     Esto simula un "Zoom al 60%" en toda la interfaz automáticamente
-     porque usas unidades 'rem' en todo el diseño.
-  */
-  font-size: 10px; 
-  
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden; /* Prohibido el scroll global */
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--background);
-  color: var(--foreground);
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
+/* --- Estilos Base (TU VERSIÓN, con ajustes) --- */
 * {
   box-sizing: border-box;
   border-color: var(--border);
   outline-color: oklch(var(--primary) / 0.5);
 }
 
-/* ==========================================================================
-   2. NAVBAR FIJA
-   ========================================================================== */
+body {
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--foreground);
+  display: flex;
+  align-items: center; /* Centrado vertical por defecto */
+  justify-content: center;
+  padding: 1rem;
+  margin: 0;
+  padding-top: 6rem; /* Espacio para la navbar fija */
+}
+
+/* --- ESTILOS DE NAVEGACIÓN --- */
 .navbar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 6rem; /* 60px reales a esta escala */
+  position: fixed; /* Fija la barra en la parte superior */
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: var(--card);
   border-bottom: 1px solid var(--border);
+  padding: 1rem;
   z-index: 1000;
-  padding: 0 2rem;
+  box-shadow: 0 4px 20px oklch(var(--primary) / 0.1);
 }
 
 .navbar-list {
   display: flex;
   gap: 2rem;
   list-style: none;
-  margin: 0; padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .navbar-link {
   font-family: monospace;
-  font-size: 1.4rem; /* Texto legible */
+  font-size: 1rem;
   color: var(--muted-foreground);
   text-decoration: none;
-  padding: 0.8rem 1.5rem;
+  padding: 0.5rem 1rem;
   border-radius: 0.5rem;
-  transition: all 0.2s;
+  transition: all 0.2s ease-out;
 }
 
-.navbar-link:hover { color: var(--foreground); background-color: oklch(var(--primary) / 0.1); }
+.navbar-link:hover {
+  color: var(--foreground);
+  background-color: oklch(var(--primary) / 0.1);
+}
+
 .navbar-link.is-active {
   color: var(--primary);
   font-weight: 700;
@@ -93,273 +79,947 @@ body {
   box-shadow: 0 0 15px oklch(var(--primary) / 0.3);
 }
 
-/* ==========================================================================
-   3. CONTENEDOR PRINCIPAL (MAIN)
-   ========================================================================== */
 main {
-  /* Padding top exacto para que no se oculte tras la navbar */
-  padding-top: 6rem; 
-  height: 100vh; /* Ocupa toda la pantalla */
   width: 100%;
+  max-width: 80rem; /* ***** AUMENTADO PARA EL DASHBOARD ***** */
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Margen interno para que el contenido respire un poco */
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  padding-bottom: 1.5rem;
+  justify-content: center;
 }
 
-/* ==========================================================================
-   4. PÁGINA: CONTROL (control.html)
-   ========================================================================== */
+/* --- Estilos del Panel --- */
 .control-panel-container {
   width: 100%;
-  max-width: 80rem;
-  height: 100%; /* Llenar verticalmente */
+  max-width: 64rem; /* El panel de control mantiene su max-width */
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.header h1 {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0 0 0.75rem 0;
+  letter-spacing: -0.025em;
+}
+
+.header .subtitle {
+  color: var(--primary);
+  font-family: monospace;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* (Estilos .last-command-wrapper y .last-command-text eliminados, ya no se usan en control.html) */
+
+.controls-wrapper {
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Distribuir espacio */
+  gap: 3rem;
+}
+
+.primary-movement-grid {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  grid-template-areas:
+    "fwd-l fwd fwd-r"
+    ". stop ."
+    "bwd-l bwd bwd-r";
+}
+
+.rotation-controls {
+  padding-top: 2rem;
+  border-top: 1px solid oklch(var(--primary) / 0.2);
+}
+
+.rotation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.rotation-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.footer {
+  margin-top: 3rem;
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  font-family: monospace;
+}
+
+/* --- Estilos de Botón --- */
+.control-button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 6rem;
+  height: 6rem;
+  border-width: 2px;
+  border-radius: 1.5rem;
+  transition: all 0.2s ease-out;
+  cursor: pointer;
+  font: inherit;
+}
+
+.control-button:active {
+  transform: scale(0.95);
+}
+
+.control-button .icon {
+  margin-bottom: 0.5rem;
+  transition: transform 0.2s;
+  font-size: 2.5rem;
+  line-height: 1;
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-button[data-command-id="10"] .icon,
+.control-button[data-command-id="11"] .icon {
+  font-size: 3rem;
+}
+
+.control-button:hover .icon {
+  transform: scale(1.1);
+}
+
+.control-button .label {
+  position: absolute;
+  bottom: -2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-family: monospace;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  color: var(--foreground);
+}
+
+.control-button:hover .label {
+  opacity: 1;
+}
+
+/* Media Query para Escritorio */
+@media (min-width: 768px) {
+  .control-button {
+    width: 8rem;
+    height: 8rem;
+  }
+  .control-button .icon {
+    font-size: 3.2rem;
+  }
+  .control-button[data-command-id="10"] .icon,
+  .control-button[data-command-id="11"] .icon {
+    font-size: 3.2rem;
+  }
+}
+
+/* --- Colores de Botones --- */
+.color-cyan {
+  background-color: oklch(var(--primary) / 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.color-cyan:hover {
+  background-color: oklch(var(--primary) / 0.2);
+  box-shadow: 0 0 20px oklch(var(--primary) / 0.5); 
+}
+.color-cyan.is-active {
+  background-color: var(--primary);
+  color: var(--background);
+  box-shadow: 0 0 30px oklch(var(--primary) / 0.8);
+}
+.color-magenta {
+  background-color: oklch(var(--secondary) / 0.1);
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+.color-magenta:hover {
+  background-color: oklch(var(--secondary) / 0.2);
+  box-shadow: 0 0 20px oklch(var(--secondary) / 0.5); 
+}
+.color-magenta.is-active {
+  background-color: var(--secondary);
+  color: var(--background);
+  box-shadow: 0 0 30px oklch(var(--secondary) / 0.8);
+}
+.color-green {
+  background-color: oklch(var(--accent) / 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.color-green:hover {
+  background-color: oklch(var(--accent) / 0.2);
+  box-shadow: 0 0 20px oklch(var(--accent) / 0.5);
+}
+.color-green.is-active {
+  background-color: var(--accent);
+  color: var(--background);
+  box-shadow: 0 0 30px oklch(var(--accent) / 0.8);
+}
+.color-blue {
+  background-color: oklch(var(--chart-4) / 0.1);
+  border-color: var(--chart-4);
+  color: var(--chart-4);
+}
+.color-blue:hover {
+  background-color: oklch(var(--chart-4) / 0.2);
+  box-shadow: 0 0 20px oklch(var(--chart-4) / 0.5);
+}
+.color-blue.is-active {
+  background-color: var(--chart-4);
+  color: var(--background);
+  box-shadow: 0 0 30px oklch(var(--chart-4) / 0.8);
+}
+.color-purple {
+  background-color: oklch(var(--purple) / 0.1);
+  border-color: var(--purple);
+  color: var(--purple);
+}
+.color-purple:hover {
+  background-color: oklch(var(--purple) / 0.2);
+  box-shadow: 0 0 20px oklch(var(--purple) / 0.5);
+}
+.color-purple.is-active {
+  background-color: var(--purple);
+  color: var(--background);
+  box-shadow: 0 0 30px oklch(var(--purple) / 0.8);
+}
+.color-red {
+  background-color: oklch(var(--destructive) / 0.1);
+  border-color: var(--destructive);
+  color: var(--destructive);
+}
+.color-red:hover {
+  background-color: oklch(var(--destructive) / 0.2);
+  box-shadow: 0 0 20px oklch(var(--destructive) / 0.5);
+}
+.color-red.is-active {
+  background-color: var(--destructive);
+  color: var(--background);
+  box-shadow: 0 0 30px oklch(var(--destructive) / 0.8);
+}
+
+
+/* *
+ * --- ESTILOS DE MONITOR ACTUALIZADOS ---
+ *
+ */
+
+.monitor-dashboard-grid {
+  display: grid;
+  /* 12 columnas */
+  grid-template-columns: repeat(12, 1fr); 
+  /* 3 filas, una para cada línea de grid-template-areas */
+  grid-template-rows: auto auto auto; 
+  gap: 1.5rem;
+  width: 100%;
+  grid-template-areas:
+    /* Fila 1: last-move (6 cols) + last-obstacle (6 cols) */
+    "last-move     last-move     last-move     last-move     last-move     last-move     last-obstacle   last-obstacle     last-obstacle   last-obstacle     last-obstacle   last-obstacle"
+    /* Fila 2: moves-log (4 cols) + obstacle-log (4 cols) + demos-log (4 cols) */
+    "moves-log     moves-log     moves-log     moves-log     obstacle-log    obstacle-log    obstacle-log    obstacle-log      demos-log       demos-log       demos-log       demos-log"
+    /* Fila 3: obstacle-mgmt (12 cols) */
+    "obstacle-mgmt obstacle-mgmt   obstacle-mgmt obstacle-mgmt obstacle-mgmt   obstacle-mgmt obstacle-mgmt obstacle-mgmt   obstacle-mgmt obstacle-mgmt   obstacle-mgmt obstacle-mgmt";
+}
+
+
+/* Cajas de Estatus (Arriba) */
+.monitor-status-box {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
+}
+
+#box-last-move {
+  grid-area: last-move;
+}
+#box-last-obstacle {
+  grid-area: last-obstacle;
+}
+#box-obstacle-mgmt {
+  grid-area: obstacle-mgmt;
+  gap: 1rem; /* Espacio entre el texto y el botón */
+}
+
+
+.monitor-status-box h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 1rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.status-text-large {
+  font-size: 1.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  word-break: break-word;
+  white-space: normal;
+  line-height: 1.3;
+  flex-grow: 1; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem; 
+}
+
+/* Cajas de Historial (Abajo) */
+.monitor-log-box {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+#box-moves-log {
+  grid-area: moves-log;
+}
+#box-obstacles-log {
+  grid-area: obstacle-log;
+}
+
+#box-demos-log {
+  grid-area: demos-log;
+}
+
+
+.monitor-log-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  flex-grow: 1; /* Permite que la lista crezca */
+  font-family: monospace;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+/* * Damos una altura fija a las listas de la fila 2
+ * para que se alineen visualmente.
+*/
+#box-moves-log .monitor-log-list,
+#box-obstacles-log .monitor-log-list,
+#box-demos-log .monitor-log-list {
+  height: 300px;
+}
+
+
+/* Estilo para items de lista y mensaje de vacío */
+.monitor-log-list li {
+  padding: 0.25rem 0.5rem;
+  border-bottom: 1px solid oklch(var(--border) / 0.2);
+}
+.monitor-log-list li:first-child {
+  color: var(--foreground); /* El más reciente */
+  font-weight: 700;
+}
+.monitor-log-list li.empty-log {
+  color: var(--muted-foreground);
+  font-style: italic;
+  text-align: center;
+  padding-top: 2rem;
+  border: none;
+}
+
+
+/* --- ESTILOS Página Demos (Placeholder) --- */
+.placeholder-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--muted-foreground);
+  border: 2px dashed var(--border);
+  padding: 4rem 6rem;
+  border-radius: 1.5rem;
+  background-color: var(--card);
+}
+.placeholder-container h1 {
+  color: var(--foreground);
+  margin: 0 0 1rem 0;
+  font-size: 2.25rem;
+}
+
+
+/*
+ *
+ * --- ¡NUEVOS ESTILOS PARA LA PÁGINA DE DEMOS! ---
+ *
+ */
+
+/* Maquetación de 2 columnas */
+.demo-layout-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+  gap: 2rem;
+  width: 100%;
+  max-width: 80rem; /* Más ancho que el main normal */
+  align-items: flex-start; /* Alinea los contenedores arriba */
+}
+
+/* Columna Izquierda: Controles Pequeños */
+.demo-controls-container {
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  padding: 1.5rem 1rem;
+  background-color: var(--card);
+  
+  /* Se pega a la parte superior */
+  position: sticky;
+  top: 6rem; /* 1rem de padding-body + 5rem de navbar */
+}
+
+/* Hacemos los controles de demo más pequeños */
+.demo-controls-container .controls-wrapper {
+  gap: 1.5rem;
+}
+.demo-controls-container .control-button {
+  width: 4.5rem; /* Más pequeño que los 6rem originales */
+  height: 4.5rem;
+  border-radius: 1.25rem;
+}
+.demo-controls-container .control-button .icon {
+  font-size: 1.75rem;
+  margin-bottom: 0; /* Quitamos margen de icono */
+}
+.demo-controls-container .control-button[data-command-id="10"] .icon,
+.demo-controls-container .control-button[data-command-id="11"] .icon {
+  font-size: 2rem;
+}
+.demo-controls-container .control-button .label {
+  display: none;
+}
+.demo-controls-container .primary-movement-grid {
+  gap: 0.5rem; /* Más compacto */
+}
+.demo-controls-container .rotation-controls {
+  padding-top: 1.5rem;
+}
+.demo-controls-container .rotation-grid {
+  gap: 1rem;
+}
+.demo-controls-container .rotation-column {
+  gap: 0.5rem;
+}
+@media (min-width: 768px) {
+  .demo-controls-container .control-button {
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+  .demo-controls-container .control-button .icon {
+    font-size: 1.75rem;
+  }
+  .demo-controls-container .control-button[data-command-id="10"] .icon,
+  .demo-controls-container .control-button[data-command-id="11"] .icon {
+    font-size: 2rem;
+  }
+}
+
+/* Columna Derecha: Contenedor de Secciones */
+.demo-sequencer-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Espacio entre la sección de Ejecutar y Crear */
+}
+
+/* Estilo base para las secciones derechas */
+.demo-run-section,
+.demo-create-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  background-color: var(--card);
+  height: 100%;
+}
+
+.demo-run-section h2,
+.demo-create-section h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0 0 0.5rem 0;
+  border-bottom: 1px solid var(--border);
   padding-bottom: 1rem;
 }
 
-.header { text-align: center; flex-shrink: 0; margin-bottom: 1rem; }
-.header h1 { font-size: 2.5rem; margin: 0; line-height: 1.2; }
-.header .subtitle { font-size: 1.2rem; color: var(--primary); font-family: monospace; }
-
-/* Wrapper de velocidad */
-.speed-control-wrapper {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin: 1rem auto;
-  background: var(--card);
-  padding: 0.5rem;
-  border-radius: 1rem;
-  border: 1px solid var(--border);
-}
-.speed-button {
-  background: transparent; border: none; color: var(--muted-foreground);
-  font-family: monospace; font-size: 1.2rem; padding: 0.5rem 1rem; cursor: pointer;
-  border-radius: 0.5rem;
-}
-.speed-button.is-active { background: var(--primary); color: var(--background); }
-
-/* Controles principales */
-.controls-wrapper {
-  flex: 1; /* Ocupa todo el espacio disponible */
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Centrado vertical */
-  align-items: center;
-  gap: 1.5rem;
-  min-height: 0; /* Permite encoger si hace falta */
+.input-label {
+  font-family: monospace;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  text-align: left;
+  margin-bottom: -0.5rem;
 }
 
-/* Grid de flechas */
-.primary-movement-grid {
-  display: grid;
-  gap: 0.8rem;
-  grid-template-areas: "fwd-l fwd fwd-r" ". stop ." "bwd-l bwd bwd-r";
-}
-
-/* Botones cuadrados */
-.control-button {
-  position: relative;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  width: 6rem; height: 6rem; /* Se ven pequeños gracias a la escala del html */
-  border: 2px solid transparent; border-radius: 1.5rem;
-  cursor: pointer; transition: all 0.2s;
-}
-.control-button:active { transform: scale(0.95); }
-.control-button .icon { font-size: 2.5rem; margin: 0; line-height: 1; }
-/* Ocultamos labels para ahorrar espacio */
-.control-button .label { display: none; } 
-
-/* Sección rotación */
-.rotation-controls { padding-top: 1rem; border-top: 1px solid oklch(var(--primary)/0.2); }
-.rotation-grid { display: flex; gap: 1.5rem; }
-.rotation-column { display: flex; flex-direction: column; gap: 0.8rem; }
-
-.footer { text-align: center; font-size: 1rem; color: var(--muted-foreground); flex-shrink: 0; }
-
-/* Colores botones */
-.color-cyan { background: oklch(var(--primary)/0.1); border-color: var(--primary); color: var(--primary); }
-.color-cyan:hover { background: oklch(var(--primary)/0.2); }
-.color-magenta { background: oklch(var(--secondary)/0.1); border-color: var(--secondary); color: var(--secondary); }
-.color-magenta:hover { background: oklch(var(--secondary)/0.2); }
-.color-red { background: oklch(var(--destructive)/0.1); border-color: var(--destructive); color: var(--destructive); }
-.color-red:hover { background: oklch(var(--destructive)/0.2); }
-.color-purple { background: oklch(var(--purple)/0.1); border-color: var(--purple); color: var(--purple); }
-.color-purple:hover { background: oklch(var(--purple)/0.2); }
-.color-green { background: oklch(var(--accent)/0.1); border-color: var(--accent); color: var(--accent); }
-.color-blue { background: oklch(var(--chart-4)/0.1); border-color: var(--chart-4); color: var(--chart-4); }
-
-/* ==========================================================================
-   5. PÁGINA: MONITOR (monitor.html) - AJUSTE PERFECTO
-   ========================================================================== */
-.monitor-dashboard-grid {
-  display: grid;
-  width: 100%;
-  height: 100%; /* Ocupar 100% del main */
-  gap: 1.5rem;
-  
-  /* FILAS:
-     1. Estatus Superior: 18% de la altura
-     2. Logs (Centro):    El espacio que sobre (1fr)
-     3. Gestión (Abajo):  12% de la altura
-  */
-  grid-template-rows: 18vh 1fr 12vh;
-  grid-template-columns: repeat(12, 1fr);
-  
-  grid-template-areas:
-    "last-move      last-move      last-move      last-move      last-move      last-move      last-obstacle    last-obstacle      last-obstacle    last-obstacle      last-obstacle    last-obstacle"
-    "moves-log      moves-log      moves-log      moves-log      obstacle-log     obstacle-log     obstacle-log     obstacle-log       demos-log        demos-log        demos-log        demos-log"
-    "obstacle-mgmt obstacle-mgmt   obstacle-mgmt obstacle-mgmt obstacle-mgmt    obstacle-mgmt obstacle-mgmt obstacle-mgmt    obstacle-mgmt obstacle-mgmt    obstacle-mgmt obstacle-mgmt";
-}
-
-/* Cajas Generales */
-.monitor-status-box, .monitor-log-box {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 1.5rem;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* IMPORTANTE: Para que el contenido no desborde */
-  min-height: 0;    /* IMPORTANTE: Para que Flexbox permita encoger */
-}
-
-/* Asignación de Areas */
-#box-last-move { grid-area: last-move; }
-#box-last-obstacle { grid-area: last-obstacle; }
-#box-moves-log { grid-area: moves-log; }
-#box-obstacles-log { grid-area: obstacle-log; }
-#box-demos-log { grid-area: demos-log; }
-#box-obstacle-mgmt { grid-area: obstacle-mgmt; flex-direction: row; align-items: center; justify-content: space-between; }
-
-/* Títulos */
-.monitor-status-box h2, .monitor-log-box h2 {
-  font-size: 1.4rem; color: var(--primary); margin: 0 0 1rem 0;
-  border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;
-  white-space: nowrap; flex-shrink: 0;
-}
-
-/* Texto Grande (Estatus) */
-.status-text-large {
-  font-size: 2.2rem; font-weight: 500; color: var(--foreground);
-  display: flex; align-items: center; justify-content: center;
-  flex-grow: 1; text-align: center;
-}
-
-/* Listas con Scroll Interno */
-.monitor-log-list {
-  flex: 1; /* Ocupa el espacio restante de la caja */
-  overflow-y: auto; /* Scroll AQUI, no en la página */
-  list-style: none; padding: 0; margin: 0;
-  font-family: monospace; font-size: 1.1rem; color: var(--muted-foreground);
-  height: 100%; /* Forzar altura */
-}
-
-.monitor-log-list li { padding: 0.4rem 0; border-bottom: 1px solid oklch(var(--border)/0.2); }
-.monitor-log-list li:first-child { color: var(--foreground); font-weight: 700; }
-
-/* Botón Gestión */
-#obstacle-action-text { font-size: 1.4rem; margin: 0; }
-.execute-action-btn {
-  background: var(--purple); color: var(--background);
-  font-family: monospace; font-weight: 700; font-size: 1.2rem;
-  padding: 0.8rem 2rem; border: none; border-radius: 0.8rem;
-  cursor: pointer; height: auto;
-}
-
-/* ==========================================================================
-   6. PÁGINA: DEMOS (demos.html) - SIN SCROLL
-   ========================================================================== */
-.demo-layout-container {
-  display: flex;
-  flex-direction: row; /* Dos columnas lado a lado */
-  gap: 2rem;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-/* Columna Izquierda (Controles) */
-.demo-controls-container {
-  width: 25rem; /* Ancho fijo */
-  flex-shrink: 0;
-  border: 1px solid var(--border);
-  border-radius: 1.5rem;
-  background: var(--card);
-  padding: 1.5rem;
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  overflow-y: auto; /* Scroll si es muy pequeño el alto */
-}
-/* Reducimos un poco los botones del panel izquierdo de demos */
-.demo-controls-container .control-button { width: 5rem; height: 5rem; }
-.demo-controls-container .icon { font-size: 2rem; }
-
-/* Columna Derecha (Secuenciador) */
-.demo-sequencer-wrapper {
-  flex: 1; /* Ocupa el resto del ancho */
-  display: flex;
-  flex-direction: column; /* Apilados verticalmente */
-  gap: 1.5rem;
-  height: 100%;
-}
-
-/* Sección Ejecutar y Crear (Mitad y Mitad) */
-.demo-run-section, .demo-create-section {
-  flex: 1; /* Repartir altura 50% / 50% */
-  background: var(--card); border: 1px solid var(--border); border-radius: 1.5rem;
-  padding: 1.5rem;
-  display: flex; flex-direction: column;
-  min-height: 0; /* Permite encogerse */
-  overflow: hidden;
-}
-
-.demo-run-section h2, .demo-create-section h2 {
-  font-size: 1.8rem; margin: 0 0 1rem 0; color: var(--foreground);
-  border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;
-  flex-shrink: 0;
-}
-
-.input-label { font-size: 1rem; color: var(--muted-foreground); margin-bottom: 0.5rem; font-family: monospace; }
 .demo-input {
-  background: oklch(0.05 0 0); border: 1px solid var(--border); color: var(--foreground);
-  padding: 0.8rem; border-radius: 0.8rem; font-size: 1.2rem; width: 100%;
-  margin-bottom: 1rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: oklch(0.05 0 0); /* Un poco más claro que el card */
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  color: var(--foreground);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none; /* Arreglo para iOS */
+  appearance: none;
 }
 
-/* Lista de movimientos CREAR DEMO (Scroll interno) */
+.demo-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 10px oklch(var(--primary) / 0.3);
+}
+
+/* Estilo para el <select> */
+select.demo-input {
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted-foreground) 50%), linear-gradient(135deg, var(--muted-foreground) 50%, transparent 50%);
+  background-position: calc(100% - 20px) calc(1em + 2px), calc(100% - 15px) calc(1em + 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
 .demo-moves-list {
-  flex: 1; /* Ocupa el espacio disponible */
-  overflow-y: auto; /* SCROLL AQUI */
-  background: oklch(0.05 0 0); border: 1px solid var(--border); border-radius: 0.8rem;
-  margin: 0; padding: 0.5rem; list-style: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  min-height: 200px; /* Altura mínima para que no colapse */
+  max-height: 400px; /* Altura máxima antes de scroll */
+  overflow-y: auto; /* Scroll si hay muchos items */
+  background-color: oklch(0.05 0 0);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.5rem;
 }
 .demo-move-item {
-  display: flex; justify-content: space-between; padding: 0.5rem 1rem;
-  border-bottom: 1px solid oklch(var(--border)/0.5); font-family: monospace; font-size: 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  font-family: monospace;
+  font-size: 1rem;
+  color: var(--foreground);
+  border-bottom: 1px solid oklch(var(--border) / 0.5);
+}
+.demo-move-item:last-child {
+  border-bottom: none;
+}
+.demo-move-item.empty {
+  color: var(--muted-foreground);
+  justify-content: center;
+  font-style: italic;
+  padding: 2rem 1rem;
+}
+.delete-move-btn {
+  background: none;
+  border: none;
+  color: oklch(var(--destructive) / 0.7);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+.delete-move-btn:hover {
+  color: var(--destructive);
+  background-color: oklch(var(--destructive) / 0.1);
 }
 
-/* Botones Grandes Acción */
-.run-demo-btn, .save-demo-btn, .delete-demo-btn, .pause-demo-btn, .stop-demo-btn, .resume-demo-btn {
-  width: 100%; padding: 1rem; font-family: monospace; font-weight: 700; font-size: 1.2rem;
-  border: none; border-radius: 0.8rem; cursor: pointer; margin-top: 0.5rem;
+/* Botón Guardar (Verde) */
+.save-demo-btn {
+  background-color: var(--primary);
+  color: var(--background);
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: monospace;
+  padding: 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  box-shadow: 0 0 20px oklch(var(--primary) / 0.3);
 }
-.run-demo-btn { background: var(--accent); color: var(--background); }
-.save-demo-btn { background: var(--primary); color: var(--background); }
-.delete-demo-btn { background: var(--destructive); color: var(--foreground); }
-.pause-demo-btn { background: var(--purple); color: var(--background); }
+.save-demo-btn:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 0 30px oklch(var(--primary) / 0.6);
+}
+.save-demo-btn:active {
+  transform: scale(0.98);
+  filter: brightness(1);
+}
 
-/* Ajuste responsive básico (Móvil vertical) */
+/* Botón Ejecutar (Cian) */
+.run-demo-btn {
+  background-color: var(--accent);
+  color: var(--background);
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: monospace;
+  padding: 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  box-shadow: 0 0 20px oklch(var(--accent) / 0.3);
+}
+.run-demo-btn:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 0 30px oklch(var(--accent) / 0.6);
+}
+.run-demo-btn:active {
+  transform: scale(0.98);
+  filter: brightness(1);
+}
+
+/* Estilo para botones deshabilitados */
+.run-demo-btn.disabled,
+.execute-action-btn:disabled,
+.pause-demo-btn:disabled, /* ***** AÑADIDO ***** */
+.resume-demo-btn:disabled, /* ***** AÑADIDO ***** */
+.stop-demo-btn:disabled /* ***** AÑADIDO ***** */ {
+  background-color: oklch(0.3 0 0); /* --muted */
+  color: oklch(0.6 0 0); /* --muted-foreground */
+  box-shadow: none;
+  cursor: not-allowed;
+  filter: none;
+}
+.run-demo-btn.disabled:hover,
+.execute-action-btn:disabled:hover,
+.pause-demo-btn:disabled:hover,
+.resume-demo-btn:disabled:hover,
+.stop-demo-btn:disabled:hover {
+  filter: none;
+}
+
+
+/* Botón Eliminar Demo (Rojo) */
+.delete-demo-btn {
+  background-color: var(--destructive);
+  color: var(--foreground); /* Texto blanco para contraste */
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: monospace;
+  padding: 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  box-shadow: 0 0 20px oklch(var(--destructive) / 0.3);
+  margin-top: -0.25rem; /* Pequeño ajuste para agruparlo con Ejecutar */
+}
+.delete-demo-btn:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 0 30px oklch(var(--destructive) / 0.6);
+}
+.delete-demo-btn:active {
+  transform: scale(0.98);
+  filter: brightness(1);
+}
+
+/* Estilo deshabilitado para el botón Eliminar */
+.delete-demo-btn.disabled {
+  background-color: oklch(0.3 0 0); /* --muted */
+  color: oklch(0.6 0 0); /* --muted-foreground */
+  box-shadow: none;
+  cursor: not-allowed;
+  filter: none;
+}
+
+/* ESTILO PARA EL NUEVO BOTÓN DE ACCIÓN */
+.execute-action-btn {
+  background-color: var(--purple); /* Usamos el color púrpura */
+  color: var(--background);
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: monospace;
+  padding: 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  box-shadow: 0 0 20px oklch(var(--purple) / 0.3);
+  width: 100%; /* Ocupa todo el ancho de su caja */
+}
+.execute-action-btn:hover:not(:disabled) {
+  filter: brightness(1.2);
+  box-shadow: 0 0 30px oklch(var(--purple) / 0.6);
+}
+.execute-action-btn:active:not(:disabled) {
+  transform: scale(0.98);
+  filter: brightness(1);
+}
+
+/* ***** INICIO: NUEVOS ESTILOS DE BOTONES DE DEMO ***** */
+.demo-in-progress-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+/* Botón de Pausa (Púrpura) - Ocupa 2 columnas */
+.pause-demo-btn {
+  grid-column: 1 / 3; /* Ocupa todo el ancho */
+  background-color: var(--purple);
+  color: var(--background);
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: monospace;
+  padding: 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  box-shadow: 0 0 20px oklch(var(--purple) / 0.3);
+}
+.pause-demo-btn:hover:not(:disabled) {
+  filter: brightness(1.2);
+  box-shadow: 0 0 30px oklch(var(--purple) / 0.6);
+}
+
+/* Botón de Continuar (Verde/Primary) */
+.resume-demo-btn {
+  background-color: var(--primary);
+  color: var(--background);
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: monospace;
+  padding: 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  box-shadow: 0 0 20px oklch(var(--primary) / 0.3);
+}
+.resume-demo-btn:hover:not(:disabled) {
+  filter: brightness(1.2);
+  box-shadow: 0 0 30px oklch(var(--primary) / 0.6);
+}
+
+/* Botón de Finalizar (Rojo/Destructive) */
+.stop-demo-btn {
+  background-color: var(--destructive);
+  color: var(--foreground);
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: monospace;
+  padding: 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  box-shadow: 0 0 20px oklch(var(--destructive) / 0.3);
+}
+.stop-demo-btn:hover:not(:disabled) {
+  filter: brightness(1.2);
+  box-shadow: 0 0 30px oklch(var(--destructive) / 0.6);
+}
+/* ***** FIN: NUEVOS ESTILOS DE BOTONES DE DEMO ***** */
+
+
+/* --- SECCIÓN RESPONSIVE PARA MÓVILES --- */
 @media (max-width: 768px) {
-  html { font-size: 9px; /* Aún más pequeño en móvil */ height: auto; overflow: auto; }
-  body { height: auto; overflow: auto; display: block; }
-  main { height: auto; overflow: visible; display: block; padding-top: 7rem;}
-  .monitor-dashboard-grid { display: flex; flex-direction: column; height: auto; }
-  .demo-layout-container { flex-direction: column; height: auto; }
-  .control-button { width: 7rem; height: 7rem; }
+  
+  body {
+    /* Alinea el contenido arriba en lugar de al centro */
+    align-items: flex-start;
+    padding-bottom: 2rem;
+  }
+
+  main {
+    /* Damos un poco de espacio desde la navbar */
+    padding-top: 1rem;
+    max-width: 100%; /* El main puede usar todo el ancho */
+  }
+
+  /* --- Ajustes de Navbar --- */
+  .navbar-list {
+    gap: 0.5rem; /* Reduce el espacio entre enlaces */
+    justify-content: center;
+    width: 100%;
+  }
+  .navbar-link {
+    padding: 0.5rem;
+    font-size: 0.875rem; /* Reduce un poco el texto */
+    white-space: nowrap; /* Evita que el texto se rompa */
+  }
+  
+  /* ***** AJUSTES RESPONSIVE DEL DASHBOARD ***** */
+  .monitor-dashboard-grid {
+    grid-template-columns: 1fr; /* Una sola columna */
+    gap: 1.5rem;
+    /* Define el orden de apilamiento (el de la imagen) */
+    grid-template-areas:
+      "last-move"
+      "last-obstacle"
+      "moves-log"
+      "obstacle-log"
+      "demos-log" 
+      "obstacle-mgmt"; /* El manejo al final */
+  }
+  #box-demos-log {
+    grid-row: auto; /* Resetea el span de fila */
+  }
+  
+  /* Resetea la altura fija en móvil */
+  #box-moves-log .monitor-log-list,
+  #box-obstacles-log .monitor-log-list,
+  #box-demos-log .monitor-log-list {
+    height: auto;
+    max-height: 250px; 
+  }
+
+  .status-text-large {
+    font-size: 1.5rem; /* Reduce el texto de estatus */
+  }
+  .monitor-status-box,
+  .monitor-log-box {
+    padding: 1rem;
+  }
+
+  /* --- Ajustes de Maquetación DEMOS --- */
+  .demo-layout-container {
+    /* Apila las columnas una encima de otra */
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 100%; /* El layout usa todo el ancho */
+  }
+
+  .demo-controls-container {
+    /* Centra el panel de control pequeño */
+    display: flex;
+    justify-content: center;
+    /* Ya no se pega al lateral */
+    position: relative;
+    top: 0;
+  }
+  
+  /* --- Ajustes de Texto --- */
+  .header h1 {
+    font-size: 1.75rem; /* 28px */
+    line-height: 2rem;
+  }
+
+  .monitor-status-box h2,
+  .monitor-log-box h2,
+  .demo-run-section h2,
+  .demo-create-section h2,
+  .placeholder-container h1 {
+    font-size: 1.5rem; /* 24px */
+  }
+  
+  .placeholder-container {
+    padding: 2rem;
+  }
+  
+  .demo-run-section,
+  .demo-create-section {
+    padding: 1rem;
+  }
+  
+  /* --- Ajustes de Botones Control --- */
+  .control-button {
+    width: 5rem; /* 80px */
+    height: 5rem;
+    border-radius: 1.25rem;
+  }
+  .control-button .icon {
+    font-size: 2rem;
+  }
+  .control-button[data-command-id="10"] .icon,
+  .control-button[data-command-id="11"] .icon {
+    font-size: 2.5rem;
+  }
+  
+  /* La media query de desktop (min-width) los agrandará de nuevo */
+} 
+/* ... (Al final de los estilos de la página de Demos) ... */
+
+.auto-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.5rem;
+  font-family: monospace;
+  font-size: 1rem;
+  color: var(--foreground);
+  cursor: pointer;
+  border-radius: 0.75rem;
+  transition: background-color 0.2s;
+  border-top: 1px solid var(--border);
+  margin-top: 0.5rem;
+}
+.auto-toggle-label:hover {
+  background-color: oklch(var(--primary) / 0.1);
+}
+.auto-toggle-checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+.speed-control-wrapper {
+  display: flex;
+  width: fit-content;
+  margin: 1.5rem auto 0 auto; /* Centrado y con espacio superior */
+  background-color: oklch(0.05 0 0); /* Fondo un poco más claro que la tarjeta */
+  border: 1px solid var(--border);
+  border-radius: 1rem; /* Radio grande para el contenedor */
+  padding: 0.25rem; /* Pequeño padding interno */
+  box-shadow: 0 4px 10px oklch(var(--background) / 0.5);
+}
+
+.speed-button {
+  background: transparent;
+  border: none;
+  font-family: monospace;
+  font-size: 0.875rem; /* 14px */
+  font-weight: 700;
+  color: var(--muted-foreground);
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.75rem; /* Radio más pequeño para el botón */
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+}
+
+.speed-button.is-active {
+  background-color: var(--primary);
+  color: var(--background);
+  box-shadow: 0 0 15px oklch(var(--primary) / 0.3);
 }
