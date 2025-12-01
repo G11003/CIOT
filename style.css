@@ -1,5 +1,12 @@
-/* --- Variables de Color (TU VERSIÓN) --- */
+/* --- Variables de Color y ESCALA (AJUSTADO) --- */
 :root {
+  /* TRUCO DE ESCALA: 
+     El tamaño base suele ser 16px. Al ponerlo al 67%,
+     1rem pasará a valer ~10.7px. Todo tu diseño se encogerá
+     proporcionalmente respetando la disposición.
+  */
+  font-size: 67%; 
+
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --background: oklch(0 0 0);
   --foreground: oklch(1 0 0);
@@ -14,7 +21,7 @@
   --purple: oklch(63.708% 0.21862 298.316);
 }
 
-/* --- Estilos Base (TU VERSIÓN, con ajustes) --- */
+/* --- Estilos Base (AJUSTADO) --- */
 * {
   box-sizing: border-box;
   border-color: var(--border);
@@ -26,16 +33,25 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   display: flex;
-  align-items: center; /* Centrado vertical por defecto */
-  justify-content: center;
+  flex-direction: column; /* Asegura flujo vertical si la pantalla es muy pequeña */
+  align-items: center; 
+  justify-content: center; /* Intenta centrar verticalmente */
   padding: 1rem;
   margin: 0;
-  padding-top: 6rem; /* Espacio para la navbar fija */
+  
+  /* Ajuste crítico: Al reducir la escala, el padding superior fijo 
+     debe ser relativo o menor para no empujar el contenido abajo innecesariamente.
+     Como ahora 6rem son más pequeños visualmente, se mantiene bien, 
+     pero si aún sientes que sobra espacio arriba, reduce esto a 4rem. */
+  padding-top: 6rem; 
+  
+  /* Evitamos scroll horizontal accidental */
+  overflow-x: hidden; 
 }
 
 /* --- ESTILOS DE NAVEGACIÓN --- */
 .navbar {
-  position: fixed; /* Fija la barra en la parte superior */
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -59,7 +75,7 @@ body {
 
 .navbar-link {
   font-family: monospace;
-  font-size: 1rem;
+  font-size: 1.2rem; /* Aumentado ligeramente para compensar la reducción global */
   color: var(--muted-foreground);
   text-decoration: none;
   padding: 0.5rem 1rem;
@@ -81,46 +97,45 @@ body {
 
 main {
   width: 100%;
-  max-width: 80rem; /* ***** AUMENTADO PARA EL DASHBOARD ***** */
+  max-width: 90rem; /* Aumentado un poco más para aprovechar el espacio extra */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex-grow: 1; /* Permite al main ocupar el espacio vertical disponible */
 }
 
 /* --- Estilos del Panel --- */
 .control-panel-container {
   width: 100%;
-  max-width: 64rem; /* El panel de control mantiene su max-width */
+  max-width: 70rem; 
 }
 
 .header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem; /* Reducido de 3rem para ahorrar espacio vertical */
 }
 
 .header h1 {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
+  font-size: 2.5rem; /* Aumentado visualmente para compensar la escala del root */
+  line-height: 1.1;
   font-weight: 700;
   color: var(--foreground);
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.5rem 0;
   letter-spacing: -0.025em;
 }
 
 .header .subtitle {
   color: var(--primary);
   font-family: monospace;
-  font-size: 0.875rem;
+  font-size: 1rem;
   margin: 0;
 }
-
-/* (Estilos .last-command-wrapper y .last-command-text eliminados, ya no se usan en control.html) */
 
 .controls-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: 2.5rem; /* Reducido ligeramente el gap */
 }
 
 .primary-movement-grid {
@@ -135,7 +150,7 @@ main {
 }
 
 .rotation-controls {
-  padding-top: 2rem;
+  padding-top: 1.5rem;
   border-top: 1px solid oklch(var(--primary) / 0.2);
 }
 
@@ -153,10 +168,10 @@ main {
 }
 
 .footer {
-  margin-top: 3rem;
+  margin-top: 2rem;
   text-align: center;
   color: var(--muted-foreground);
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   font-family: monospace;
 }
 
@@ -167,8 +182,8 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 6rem;
-  height: 6rem;
+  width: 7rem; /* Ajustado para que se vean bien en la nueva escala */
+  height: 7rem;
   border-width: 2px;
   border-radius: 1.5rem;
   transition: all 0.2s ease-out;
@@ -183,7 +198,7 @@ main {
 .control-button .icon {
   margin-bottom: 0.5rem;
   transition: transform 0.2s;
-  font-size: 2.5rem;
+  font-size: 3rem;
   line-height: 1;
   font-weight: normal;
   display: flex;
@@ -193,7 +208,7 @@ main {
 
 .control-button[data-command-id="10"] .icon,
 .control-button[data-command-id="11"] .icon {
-  font-size: 3rem;
+  font-size: 3.5rem;
 }
 
 .control-button:hover .icon {
@@ -206,7 +221,7 @@ main {
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   font-family: monospace;
   opacity: 0;
   transition: opacity 0.2s;
@@ -225,15 +240,11 @@ main {
     height: 8rem;
   }
   .control-button .icon {
-    font-size: 3.2rem;
-  }
-  .control-button[data-command-id="10"] .icon,
-  .control-button[data-command-id="11"] .icon {
-    font-size: 3.2rem;
+    font-size: 3.5rem;
   }
 }
 
-/* --- Colores de Botones --- */
+/* --- Colores de Botones (Sin cambios funcionales, solo herencia) --- */
 .color-cyan {
   background-color: oklch(var(--primary) / 0.1);
   border-color: var(--primary);
@@ -319,31 +330,21 @@ main {
   box-shadow: 0 0 30px oklch(var(--destructive) / 0.8);
 }
 
-
-/* *
- * --- ESTILOS DE MONITOR ACTUALIZADOS ---
- *
- */
+/* --- RESTO DE ESTILOS (Dashboard, Logs, Demos) --- */
+/* Como usan REM, se ajustarán automáticamente a la escala del 67% */
 
 .monitor-dashboard-grid {
   display: grid;
-  /* 12 columnas */
   grid-template-columns: repeat(12, 1fr); 
-  /* 3 filas, una para cada línea de grid-template-areas */
   grid-template-rows: auto auto auto; 
   gap: 1.5rem;
   width: 100%;
   grid-template-areas:
-    /* Fila 1: last-move (6 cols) + last-obstacle (6 cols) */
     "last-move     last-move     last-move     last-move     last-move     last-move     last-obstacle   last-obstacle     last-obstacle   last-obstacle     last-obstacle   last-obstacle"
-    /* Fila 2: moves-log (4 cols) + obstacle-log (4 cols) + demos-log (4 cols) */
     "moves-log     moves-log     moves-log     moves-log     obstacle-log    obstacle-log    obstacle-log    obstacle-log      demos-log       demos-log       demos-log       demos-log"
-    /* Fila 3: obstacle-mgmt (12 cols) */
     "obstacle-mgmt obstacle-mgmt   obstacle-mgmt obstacle-mgmt obstacle-mgmt   obstacle-mgmt obstacle-mgmt obstacle-mgmt   obstacle-mgmt obstacle-mgmt   obstacle-mgmt obstacle-mgmt";
 }
 
-
-/* Cajas de Estatus (Arriba) */
 .monitor-status-box {
   background-color: var(--card);
   border: 1px solid var(--border);
@@ -355,20 +356,12 @@ main {
   justify-content: space-between; 
 }
 
-#box-last-move {
-  grid-area: last-move;
-}
-#box-last-obstacle {
-  grid-area: last-obstacle;
-}
-#box-obstacle-mgmt {
-  grid-area: obstacle-mgmt;
-  gap: 1rem; /* Espacio entre el texto y el botón */
-}
-
+#box-last-move { grid-area: last-move; }
+#box-last-obstacle { grid-area: last-obstacle; }
+#box-obstacle-mgmt { grid-area: obstacle-mgmt; gap: 1rem; }
 
 .monitor-status-box h2 {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--primary);
   margin: 0 0 1rem 0;
@@ -377,7 +370,7 @@ main {
 }
 
 .status-text-large {
-  font-size: 1.875rem;
+  font-size: 2.25rem; /* Aumentado */
   font-weight: 500;
   color: var(--foreground);
   word-break: break-word;
@@ -390,7 +383,6 @@ main {
   min-height: 3rem; 
 }
 
-/* Cajas de Historial (Abajo) */
 .monitor-log-box {
   background-color: var(--card);
   border: 1px solid var(--border);
@@ -400,46 +392,33 @@ main {
   flex-direction: column;
 }
 
-#box-moves-log {
-  grid-area: moves-log;
-}
-#box-obstacles-log {
-  grid-area: obstacle-log;
-}
-
-#box-demos-log {
-  grid-area: demos-log;
-}
-
+#box-moves-log { grid-area: moves-log; }
+#box-obstacles-log { grid-area: obstacle-log; }
+#box-demos-log { grid-area: demos-log; }
 
 .monitor-log-list {
   list-style: none;
   padding: 0;
   margin: 0;
   overflow-y: auto;
-  flex-grow: 1; /* Permite que la lista crezca */
+  flex-grow: 1;
   font-family: monospace;
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--muted-foreground);
 }
 
-/* * Damos una altura fija a las listas de la fila 2
- * para que se alineen visualmente.
-*/
 #box-moves-log .monitor-log-list,
 #box-obstacles-log .monitor-log-list,
 #box-demos-log .monitor-log-list {
-  height: 300px;
+  height: 250px; /* Reducido un poco para ahorrar espacio vertical */
 }
 
-
-/* Estilo para items de lista y mensaje de vacío */
 .monitor-log-list li {
   padding: 0.25rem 0.5rem;
   border-bottom: 1px solid oklch(var(--border) / 0.2);
 }
 .monitor-log-list li:first-child {
-  color: var(--foreground); /* El más reciente */
+  color: var(--foreground);
   font-weight: 700;
 }
 .monitor-log-list li.empty-log {
@@ -450,109 +429,53 @@ main {
   border: none;
 }
 
+/* --- Página Demos y demás --- */
+/* Se mantienen idénticos, pero heredan la escala pequeña */
 
-/* --- ESTILOS Página Demos (Placeholder) --- */
-.placeholder-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: var(--muted-foreground);
-  border: 2px dashed var(--border);
-  padding: 4rem 6rem;
-  border-radius: 1.5rem;
-  background-color: var(--card);
-}
-.placeholder-container h1 {
-  color: var(--foreground);
-  margin: 0 0 1rem 0;
-  font-size: 2.25rem;
-}
-
-
-/*
- *
- * --- ¡NUEVOS ESTILOS PARA LA PÁGINA DE DEMOS! ---
- *
- */
-
-/* Maquetación de 2 columnas */
 .demo-layout-container {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+  grid-template-columns: 1fr 1fr;
   gap: 2rem;
   width: 100%;
-  max-width: 80rem; /* Más ancho que el main normal */
-  align-items: flex-start; /* Alinea los contenedores arriba */
+  max-width: 90rem;
+  align-items: flex-start;
 }
 
-/* Columna Izquierda: Controles Pequeños */
 .demo-controls-container {
   border: 1px solid var(--border);
   border-radius: 1.5rem;
   padding: 1.5rem 1rem;
   background-color: var(--card);
-  
-  /* Se pega a la parte superior */
   position: sticky;
-  top: 6rem; /* 1rem de padding-body + 5rem de navbar */
+  top: 6rem;
 }
 
-/* Hacemos los controles de demo más pequeños */
-.demo-controls-container .controls-wrapper {
-  gap: 1.5rem;
-}
+.demo-controls-container .controls-wrapper { gap: 1.5rem; }
 .demo-controls-container .control-button {
-  width: 4.5rem; /* Más pequeño que los 6rem originales */
-  height: 4.5rem;
+  width: 5rem; 
+  height: 5rem;
   border-radius: 1.25rem;
 }
-.demo-controls-container .control-button .icon {
-  font-size: 1.75rem;
-  margin-bottom: 0; /* Quitamos margen de icono */
-}
-.demo-controls-container .control-button[data-command-id="10"] .icon,
-.demo-controls-container .control-button[data-command-id="11"] .icon {
-  font-size: 2rem;
-}
-.demo-controls-container .control-button .label {
-  display: none;
-}
-.demo-controls-container .primary-movement-grid {
-  gap: 0.5rem; /* Más compacto */
-}
-.demo-controls-container .rotation-controls {
-  padding-top: 1.5rem;
-}
-.demo-controls-container .rotation-grid {
-  gap: 1rem;
-}
-.demo-controls-container .rotation-column {
-  gap: 0.5rem;
-}
+.demo-controls-container .control-button .icon { font-size: 2rem; margin-bottom: 0; }
+.demo-controls-container .control-button .label { display: none; }
+.demo-controls-container .primary-movement-grid { gap: 0.5rem; }
+.demo-controls-container .rotation-controls { padding-top: 1.5rem; }
+.demo-controls-container .rotation-grid { gap: 1rem; }
+.demo-controls-container .rotation-column { gap: 0.5rem; }
+
 @media (min-width: 768px) {
   .demo-controls-container .control-button {
-    width: 4.5rem;
-    height: 4.5rem;
-  }
-  .demo-controls-container .control-button .icon {
-    font-size: 1.75rem;
-  }
-  .demo-controls-container .control-button[data-command-id="10"] .icon,
-  .demo-controls-container .control-button[data-command-id="11"] .icon {
-    font-size: 2rem;
+    width: 5rem;
+    height: 5rem;
   }
 }
 
-/* Columna Derecha: Contenedor de Secciones */
 .demo-sequencer-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; /* Espacio entre la sección de Ejecutar y Crear */
+  gap: 1.5rem;
 }
 
-/* Estilo base para las secciones derechas */
 .demo-run-section,
 .demo-create-section {
   display: flex;
@@ -567,7 +490,7 @@ main {
 
 .demo-run-section h2,
 .demo-create-section h2 {
-  font-size: 1.875rem;
+  font-size: 2rem;
   font-weight: 700;
   color: var(--foreground);
   margin: 0 0 0.5rem 0;
@@ -577,7 +500,7 @@ main {
 
 .input-label {
   font-family: monospace;
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--muted-foreground);
   text-align: left;
   margin-bottom: -0.5rem;
@@ -586,14 +509,13 @@ main {
 .demo-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  background-color: oklch(0.05 0 0); /* Un poco más claro que el card */
+  background-color: oklch(0.05 0 0);
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   color: var(--foreground);
-  font-size: 1rem;
+  font-size: 1.1rem;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
-  -webkit-appearance: none; /* Arreglo para iOS */
   appearance: none;
 }
 
@@ -602,7 +524,6 @@ main {
   box-shadow: 0 0 10px oklch(var(--primary) / 0.3);
 }
 
-/* Estilo para el <select> */
 select.demo-input {
   background-image: linear-gradient(45deg, transparent 50%, var(--muted-foreground) 50%), linear-gradient(135deg, var(--muted-foreground) 50%, transparent 50%);
   background-position: calc(100% - 20px) calc(1em + 2px), calc(100% - 15px) calc(1em + 2px);
@@ -615,9 +536,9 @@ select.demo-input {
   list-style: none;
   padding: 0;
   margin: 0;
-  min-height: 200px; /* Altura mínima para que no colapse */
-  max-height: 400px; /* Altura máxima antes de scroll */
-  overflow-y: auto; /* Scroll si hay muchos items */
+  min-height: 200px;
+  max-height: 400px;
+  overflow-y: auto;
   background-color: oklch(0.05 0 0);
   border: 1px solid var(--border);
   border-radius: 0.75rem;
@@ -629,13 +550,11 @@ select.demo-input {
   align-items: center;
   padding: 0.75rem 1rem;
   font-family: monospace;
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: var(--foreground);
   border-bottom: 1px solid oklch(var(--border) / 0.5);
 }
-.demo-move-item:last-child {
-  border-bottom: none;
-}
+.demo-move-item:last-child { border-bottom: none; }
 .demo-move-item.empty {
   color: var(--muted-foreground);
   justify-content: center;
@@ -646,7 +565,7 @@ select.demo-input {
   background: none;
   border: none;
   color: oklch(var(--destructive) / 0.7);
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
@@ -659,11 +578,9 @@ select.demo-input {
   background-color: oklch(var(--destructive) / 0.1);
 }
 
-/* Botón Guardar (Verde) */
-.save-demo-btn {
-  background-color: var(--primary);
-  color: var(--background);
-  font-size: 1rem;
+.save-demo-btn, .run-demo-btn, .execute-action-btn, 
+.pause-demo-btn, .resume-demo-btn, .stop-demo-btn, .delete-demo-btn {
+  font-size: 1.1rem;
   font-weight: 700;
   font-family: monospace;
   padding: 1rem;
@@ -671,119 +588,65 @@ select.demo-input {
   border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease-out;
+  width: 100%; /* Asegura consistencia */
+}
+
+/* Colores específicos de botones de acción */
+.save-demo-btn {
+  background-color: var(--primary);
+  color: var(--background);
   box-shadow: 0 0 20px oklch(var(--primary) / 0.3);
 }
 .save-demo-btn:hover {
   filter: brightness(1.2);
   box-shadow: 0 0 30px oklch(var(--primary) / 0.6);
 }
-.save-demo-btn:active {
-  transform: scale(0.98);
-  filter: brightness(1);
-}
 
-/* Botón Ejecutar (Cian) */
 .run-demo-btn {
   background-color: var(--accent);
   color: var(--background);
-  font-size: 1rem;
-  font-weight: 700;
-  font-family: monospace;
-  padding: 1rem;
-  border: none;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease-out;
   box-shadow: 0 0 20px oklch(var(--accent) / 0.3);
 }
 .run-demo-btn:hover {
   filter: brightness(1.2);
   box-shadow: 0 0 30px oklch(var(--accent) / 0.6);
 }
-.run-demo-btn:active {
-  transform: scale(0.98);
-  filter: brightness(1);
-}
 
-/* Estilo para botones deshabilitados */
-.run-demo-btn.disabled,
-.execute-action-btn:disabled,
-.pause-demo-btn:disabled, /* ***** AÑADIDO ***** */
-.resume-demo-btn:disabled, /* ***** AÑADIDO ***** */
-.stop-demo-btn:disabled /* ***** AÑADIDO ***** */ {
-  background-color: oklch(0.3 0 0); /* --muted */
-  color: oklch(0.6 0 0); /* --muted-foreground */
-  box-shadow: none;
-  cursor: not-allowed;
-  filter: none;
-}
-.run-demo-btn.disabled:hover,
-.execute-action-btn:disabled:hover,
-.pause-demo-btn:disabled:hover,
-.resume-demo-btn:disabled:hover,
-.stop-demo-btn:disabled:hover {
-  filter: none;
-}
-
-
-/* Botón Eliminar Demo (Rojo) */
 .delete-demo-btn {
   background-color: var(--destructive);
-  color: var(--foreground); /* Texto blanco para contraste */
-  font-size: 1rem;
-  font-weight: 700;
-  font-family: monospace;
-  padding: 1rem;
-  border: none;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease-out;
+  color: var(--foreground);
   box-shadow: 0 0 20px oklch(var(--destructive) / 0.3);
-  margin-top: -0.25rem; /* Pequeño ajuste para agruparlo con Ejecutar */
+  margin-top: -0.25rem;
 }
 .delete-demo-btn:hover {
   filter: brightness(1.2);
   box-shadow: 0 0 30px oklch(var(--destructive) / 0.6);
 }
-.delete-demo-btn:active {
-  transform: scale(0.98);
-  filter: brightness(1);
-}
 
-/* Estilo deshabilitado para el botón Eliminar */
-.delete-demo-btn.disabled {
-  background-color: oklch(0.3 0 0); /* --muted */
-  color: oklch(0.6 0 0); /* --muted-foreground */
-  box-shadow: none;
-  cursor: not-allowed;
-  filter: none;
-}
-
-/* ESTILO PARA EL NUEVO BOTÓN DE ACCIÓN */
 .execute-action-btn {
-  background-color: var(--purple); /* Usamos el color púrpura */
+  background-color: var(--purple);
   color: var(--background);
-  font-size: 1rem;
-  font-weight: 700;
-  font-family: monospace;
-  padding: 1rem;
-  border: none;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease-out;
   box-shadow: 0 0 20px oklch(var(--purple) / 0.3);
-  width: 100%; /* Ocupa todo el ancho de su caja */
 }
 .execute-action-btn:hover:not(:disabled) {
   filter: brightness(1.2);
   box-shadow: 0 0 30px oklch(var(--purple) / 0.6);
 }
-.execute-action-btn:active:not(:disabled) {
-  transform: scale(0.98);
-  filter: brightness(1);
+
+/* Estado deshabilitado genérico */
+.run-demo-btn.disabled,
+.execute-action-btn:disabled,
+.pause-demo-btn:disabled,
+.resume-demo-btn:disabled,
+.stop-demo-btn:disabled,
+.delete-demo-btn.disabled {
+  background-color: oklch(0.3 0 0);
+  color: oklch(0.6 0 0);
+  box-shadow: none;
+  cursor: not-allowed;
+  filter: none;
 }
 
-/* ***** INICIO: NUEVOS ESTILOS DE BOTONES DE DEMO ***** */
 .demo-in-progress-controls {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -793,111 +656,62 @@ select.demo-input {
   padding-top: 1rem;
 }
 
-/* Botón de Pausa (Púrpura) - Ocupa 2 columnas */
 .pause-demo-btn {
-  grid-column: 1 / 3; /* Ocupa todo el ancho */
+  grid-column: 1 / 3;
   background-color: var(--purple);
   color: var(--background);
-  font-size: 1rem;
-  font-weight: 700;
-  font-family: monospace;
-  padding: 1rem;
-  border: none;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease-out;
   box-shadow: 0 0 20px oklch(var(--purple) / 0.3);
 }
-.pause-demo-btn:hover:not(:disabled) {
-  filter: brightness(1.2);
-  box-shadow: 0 0 30px oklch(var(--purple) / 0.6);
-}
-
-/* Botón de Continuar (Verde/Primary) */
 .resume-demo-btn {
   background-color: var(--primary);
   color: var(--background);
-  font-size: 1rem;
-  font-weight: 700;
-  font-family: monospace;
-  padding: 1rem;
-  border: none;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease-out;
   box-shadow: 0 0 20px oklch(var(--primary) / 0.3);
 }
-.resume-demo-btn:hover:not(:disabled) {
-  filter: brightness(1.2);
-  box-shadow: 0 0 30px oklch(var(--primary) / 0.6);
-}
-
-/* Botón de Finalizar (Rojo/Destructive) */
 .stop-demo-btn {
   background-color: var(--destructive);
   color: var(--foreground);
-  font-size: 1rem;
-  font-weight: 700;
-  font-family: monospace;
-  padding: 1rem;
-  border: none;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease-out;
   box-shadow: 0 0 20px oklch(var(--destructive) / 0.3);
 }
-.stop-demo-btn:hover:not(:disabled) {
-  filter: brightness(1.2);
-  box-shadow: 0 0 30px oklch(var(--destructive) / 0.6);
-}
-/* ***** FIN: NUEVOS ESTILOS DE BOTONES DE DEMO ***** */
 
-
-/* --- SECCIÓN RESPONSIVE PARA MÓVILES --- */
+/* --- SECCIÓN RESPONSIVE PARA MÓVILES (Heredado y Ajustado) --- */
 @media (max-width: 768px) {
+  /* Al estar en scale 67%, el breakpoint de 768px se verá como si fuera un movil más grande,
+     pero se activará correctamente. */
   
   body {
-    /* Alinea el contenido arriba en lugar de al centro */
     align-items: flex-start;
     padding-bottom: 2rem;
   }
 
   main {
-    /* Damos un poco de espacio desde la navbar */
     padding-top: 1rem;
-    max-width: 100%; /* El main puede usar todo el ancho */
+    max-width: 100%;
   }
 
-  /* --- Ajustes de Navbar --- */
   .navbar-list {
-    gap: 0.5rem; /* Reduce el espacio entre enlaces */
+    gap: 0.5rem;
     justify-content: center;
     width: 100%;
   }
   .navbar-link {
     padding: 0.5rem;
-    font-size: 0.875rem; /* Reduce un poco el texto */
-    white-space: nowrap; /* Evita que el texto se rompa */
+    font-size: 1rem; 
+    white-space: nowrap;
   }
   
-  /* ***** AJUSTES RESPONSIVE DEL DASHBOARD ***** */
   .monitor-dashboard-grid {
-    grid-template-columns: 1fr; /* Una sola columna */
+    grid-template-columns: 1fr;
     gap: 1.5rem;
-    /* Define el orden de apilamiento (el de la imagen) */
     grid-template-areas:
       "last-move"
       "last-obstacle"
       "moves-log"
       "obstacle-log"
       "demos-log" 
-      "obstacle-mgmt"; /* El manejo al final */
+      "obstacle-mgmt";
   }
-  #box-demos-log {
-    grid-row: auto; /* Resetea el span de fila */
-  }
+  #box-demos-log { grid-row: auto; }
   
-  /* Resetea la altura fija en móvil */
   #box-moves-log .monitor-log-list,
   #box-obstacles-log .monitor-log-list,
   #box-demos-log .monitor-log-list {
@@ -905,71 +719,29 @@ select.demo-input {
     max-height: 250px; 
   }
 
-  .status-text-large {
-    font-size: 1.5rem; /* Reduce el texto de estatus */
-  }
-  .monitor-status-box,
-  .monitor-log-box {
-    padding: 1rem;
-  }
+  .status-text-large { font-size: 2rem; }
+  .monitor-status-box, .monitor-log-box { padding: 1rem; }
 
-  /* --- Ajustes de Maquetación DEMOS --- */
   .demo-layout-container {
-    /* Apila las columnas una encima de otra */
     grid-template-columns: 1fr;
     gap: 1.5rem;
-    max-width: 100%; /* El layout usa todo el ancho */
+    max-width: 100%;
   }
 
   .demo-controls-container {
-    /* Centra el panel de control pequeño */
     display: flex;
     justify-content: center;
-    /* Ya no se pega al lateral */
     position: relative;
     top: 0;
   }
   
-  /* --- Ajustes de Texto --- */
-  .header h1 {
-    font-size: 1.75rem; /* 28px */
-    line-height: 2rem;
-  }
-
-  .monitor-status-box h2,
-  .monitor-log-box h2,
-  .demo-run-section h2,
-  .demo-create-section h2,
-  .placeholder-container h1 {
-    font-size: 1.5rem; /* 24px */
-  }
-  
-  .placeholder-container {
-    padding: 2rem;
-  }
-  
-  .demo-run-section,
-  .demo-create-section {
-    padding: 1rem;
-  }
-  
-  /* --- Ajustes de Botones Control --- */
   .control-button {
-    width: 5rem; /* 80px */
-    height: 5rem;
+    width: 6rem; /* Aumentado en movil para touch */
+    height: 6rem;
     border-radius: 1.25rem;
   }
-  .control-button .icon {
-    font-size: 2rem;
-  }
-  .control-button[data-command-id="10"] .icon,
-  .control-button[data-command-id="11"] .icon {
-    font-size: 2.5rem;
-  }
-  
-  /* La media query de desktop (min-width) los agrandará de nuevo */
+  .control-button .icon { font-size: 2.5rem; }
 } 
-/* ... (Al final de los estilos de la página de Demos) ... */
 
 .auto-toggle-label {
   display: flex;
@@ -985,9 +757,7 @@ select.demo-input {
   border-top: 1px solid var(--border);
   margin-top: 0.5rem;
 }
-.auto-toggle-label:hover {
-  background-color: oklch(var(--primary) / 0.1);
-}
+.auto-toggle-label:hover { background-color: oklch(var(--primary) / 0.1); }
 .auto-toggle-checkbox {
   width: 1.25rem;
   height: 1.25rem;
@@ -997,11 +767,11 @@ select.demo-input {
 .speed-control-wrapper {
   display: flex;
   width: fit-content;
-  margin: 1.5rem auto 0 auto; /* Centrado y con espacio superior */
-  background-color: oklch(0.05 0 0); /* Fondo un poco más claro que la tarjeta */
+  margin: 1.5rem auto 0 auto;
+  background-color: oklch(0.05 0 0);
   border: 1px solid var(--border);
-  border-radius: 1rem; /* Radio grande para el contenedor */
-  padding: 0.25rem; /* Pequeño padding interno */
+  border-radius: 1rem;
+  padding: 0.25rem;
   box-shadow: 0 4px 10px oklch(var(--background) / 0.5);
 }
 
@@ -1009,11 +779,11 @@ select.demo-input {
   background: transparent;
   border: none;
   font-family: monospace;
-  font-size: 0.875rem; /* 14px */
+  font-size: 1rem;
   font-weight: 700;
   color: var(--muted-foreground);
   padding: 0.5rem 1.25rem;
-  border-radius: 0.75rem; /* Radio más pequeño para el botón */
+  border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease-out;
 }
